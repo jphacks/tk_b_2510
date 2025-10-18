@@ -31,7 +31,7 @@ export default function LoginPage() {
     await new Promise((r) => setTimeout(r, 800));
     setLoading(false);
 
-    console.log("ログイン試行:", { email, password });
+    console.log("ログイン試行:", { email });
     alert("モックログイン成功: " + email);
   }
 
