@@ -39,6 +39,7 @@ function DiaryPage() {
     // add a class name variable for the button
     const timelapseBtnClass = isMonthEnd ? 'timelapse-btn glow' : 'timelapse-btn';
 
+    // 💡 ユーザーセッションと写真をsupabaseから取得 (useEffect)
     useEffect(() => {
         let mounted = true;
         (async () => {
@@ -53,7 +54,8 @@ function DiaryPage() {
                 const userId = user.id;
 
                 // 2) user_id をクエリに含めて API を呼ぶ
-                const API_ENDPOINT = `/api/photos?user_id=${encodeURIComponent(userId)}`;
+                // 💡 修正: Next.jsの404エラーを回避するため、FastAPIの完全なURLに修正 (http://localhost:8000/photos)
+                const API_ENDPOINT = `http://localhost:8000/photos?user_id=${encodeURIComponent(userId)}`;
                 const res = await fetch(API_ENDPOINT);
 
                 if (!res.ok) {

@@ -100,7 +100,6 @@ async def analyze_and_save(
         comment_text = analysis_result.get("comment", "日記コメント生成失敗")
 
         # 5. 画像をSupabase Storageにアップロード
-        # ファイル名を 'ユーザーID/タイムスタンプ.jpg' の形式で作成
         file_path = f"{user_id}/{int(time.time())}_{image.filename}"
         
         # Storageにアップロード
@@ -119,6 +118,7 @@ async def analyze_and_save(
             "emotion": emotion_text,
             "comment": comment_text,
             "image_url": image_url,
+            "file_path": file_path,
             "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
         }).execute()
 
@@ -145,9 +145,35 @@ def read_root():
     return {"status": "ok", "service": "Emolog Backend"}
 
 # -----------------
-# 6. (不足) 日記表示用のAPI
+# 6. (不足) 日記表示用のAPI (P2タスク)
 # -----------------
-# P2タスクで必要となるが、現状は実装されていないエンドポイント
-# @app.get("/api/photos") 
-# async def get_user_diaries(user_id: str):
-#     ...
+@app.get("/photos")
+async def get_user_diaries(user_id: str):
+    """
+    指定されたユーザーIDの全投稿（写真とAI分析結果）をDBから取得するエンドポイント。
+    """
+    try:
+        # Supabaseの'posts'テーブルから、指定された user_id のデータを取得
+        # 最新の投稿が上になるように created_at で降順ソート
+        res = supabase.table("posts").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+        
+        # 取得したデータをフロントエンドが期待する形式に整形
+        photos_data = []
+        for post in res.data:
+            # created_at の形式から日付部分 (YYYY-MM-DD) のみを抽出
+            date_obj = post.get("created_at")
+            date_only = date_obj.split(" ")[0] if date_obj else time.strftime("%Y-%m-%d")
+
+            photos_data.append({
+                "id": post["id"],
+                "date": date_only, # YYYY-MM-DD 形式
+                "url": post["image_url"],
+                # AIの感情とコメントを結合してキャプションとして利用
+                "caption": f"AI分析: {post.get('emotion', 'N/A')} - {post.get('comment', 'N/A')}",
+            })
+        
+        return photos_data
+
+    except Exception as e:
+        print(f"Error fetching diaries: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch diary data: {str(e)}")
