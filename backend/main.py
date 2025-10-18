@@ -115,7 +115,7 @@ async def analyze_and_save_diary(
         }).execute()
         
         # 挿入されたレコードのIDを取得
-        new_diary_id = data[1][0]['id'] 
+        new_diary_id = data[0][0]['id'] 
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"DB保存失敗: {e}")
