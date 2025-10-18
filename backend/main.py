@@ -34,12 +34,6 @@ if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 BUCKET_NAME = "post_photos"
 
-# 確認ログ（デバッグ用）: SERVICE_ROLEキーがセットされていることを確認
-if SUPABASE_SERVICE_ROLE_KEY:
-    print("Supabase SERVICE_ROLE_KEY is set (server should bypass RLS).")
-else:
-    print("WARNING: SERVICE_ROLE_KEY not set. Inserts may be blocked by RLS.")
-
 # Geminiクライアントの初期化
 if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEYが設定されていません。")
