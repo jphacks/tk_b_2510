@@ -1,114 +1,214 @@
-/* PostPage.css */
+/* レイアウト */
+.diary-root { padding:16px; font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; color:#222; }
 
-/* ページ全体 */
-body {
-    font-family: sans-serif;
-    background-color: #f0f0f5; /* 淡いグレーの背景色 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
+/* ヘッダー */
+.diary-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.diary-header h2 { margin:0; font-size:18px; font-weight:600; }
+.diary-header button { background:#fff; border:1px solid #ddd; padding:6px 10px; border-radius:6px; cursor:pointer; }
+.diary-header button:hover { background:#f6f6f6; }
+
+/* カレンダー */
+.calendar { width:100%; border-collapse:collapse; table-layout:fixed; }
+.calendar thead th { background:#fafafa; padding:8px 4px; text-align:center; font-weight:600; color:#555; border-bottom:1px solid #eee; }
+.calendar td { vertical-align:top; width:14.2857%; height:120px; border:1px solid #eee; padding:6px; position:relative; background:#fff; overflow:hidden; }
+
+/* 空セル */
+.calendar td.empty { background:#fbfbfb; }
+
+/* 日付表示 */
+.day-number { font-size:12px; color:#666; margin-bottom:6px; }
+
+/* サムネイル群 */
+.thumbs { display:flex; gap:6px; flex-wrap:wrap; align-items:flex-start; }
+.thumb { width:36px; height:36px; object-fit:cover; border-radius:6px; cursor:pointer; border:1px solid #e6e6e6; box-shadow:0 1px 2px rgba(0,0,0,0.03); transition:transform .12s ease, box-shadow .12s ease; }
+.thumb:hover { transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,0.08); }
+
+/* 追加枚数表示 */
+.more-count { position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:11px; padding:3px 8px; border-radius:999px; }
+
+/* モーダル */
+.modal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:1000; padding:16px; }
+.modal-content { background:#fff; padding:12px; border-radius:10px; max-width:900px; max-height:90vh; overflow:auto; position:relative; box-shadow:0 10px 30px rgba(0,0,0,0.25); }
+.modal-content img { display:block; max-width:100%; height:auto; border-radius:8px; margin-bottom:8px; }
+.modal-content .caption { margin:0; color:#333; font-size:14px; }
+.close { position:absolute; top:8px; right:8px; background:transparent; border:none; font-size:18px; cursor:pointer; color:#666; }
+
+/* 小画面対応 */
+@media (max-width:640px) {
+  .calendar td { height:100px; padding:4px; }
+  .thumb { width:28px; height:28px; }
+  .diary-header h2 { font-size:16px; }
 }
 
-/* フォームの入れ物（カード） */
-.post-container {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 500px;
-    margin: 20px auto;
-    text-align: center;
+/* ソフトで落ち着いた配色（背景にやわらかいミント／アイボリー系） */
+:root {
+  --bg-start: #f6fbf9;
+  --bg-end:   #eef7f3;
+  --card:     #ffffff;
+  --muted:    #7b8b83;
+  --accent:   #7fbba9; /* 優しいセージグリーン */
+  --shadow:   rgba(31, 45, 40, 0.06);
 }
 
-h2 {
-    color: #4a5568;
-    margin-bottom: 25px;
+/* 全体 */
+.diary-root {
+  min-height: 100vh;
+  padding: 24px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #223;
+  background: linear-gradient(180deg, var(--bg-start), var(--bg-end));
+  box-sizing: border-box;
 }
 
-/* 写真選択ボタン */
-.upload-label {
-    display: block;
-    padding: 20px;
-    background-color: #5A67D8; /* 青色のメインカラー */
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-bottom: 20px;
-    font-weight: bold;
-    font-size: 1.1em;
-    transition: background-color 0.2s;
+/* ヘッダー */
+.diary-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
+  padding:10px 12px;
+  border-radius:12px;
+  box-shadow: 0 6px 18px var(--shadow);
+}
+.diary-header h2 { margin:0; font-size:18px; font-weight:600; color:#234; }
+.diary-header button {
+  background: var(--card);
+  border: 1px solid rgba(124,139,130,0.12);
+  padding:8px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  color: #2b3b35;
+  box-shadow: 0 3px 8px rgba(50,70,60,0.04);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.diary-header button:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(50,70,60,0.06); }
+
+/* カレンダー */
+.calendar {
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  border-radius:12px;
+  overflow:hidden;
+  background: transparent;
+}
+.calendar thead th {
+  background: transparent;
+  padding:10px 6px;
+  text-align:center;
+  font-weight:700;
+  color:var(--muted);
+  font-size:13px;
+}
+.calendar td {
+  vertical-align:top;
+  width:14.2857%;
+  min-height:120px;
+  height:auto;
+  border: none;
+  padding:10px;
+  background: rgba(255,255,255,0.6);
+  margin:0;
+  position:relative;
+  box-shadow: inset 0 -1px 0 rgba(120,140,130,0.02);
+  transition: background .12s ease;
 }
 
-.upload-label:hover {
-    background-color: #434190;
+/* 空セル */
+.calendar td.empty { background: transparent; }
+
+/* 日付表示 */
+.day-number {
+  font-size:12px;
+  color:#486157;
+  margin-bottom:8px;
+  font-weight:600;
 }
 
-/* プレビュー画像 */
-.preview-image {
-    max-width: 100%;
-    max-height: 300px;
-    object-fit: contain;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border: 2px solid #5A67D8; /* 枠線 */
+/* サムネイル群 */
+.thumbs {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:flex-start;
+}
+.thumb {
+  width:44px;
+  height:44px;
+  object-fit:cover;
+  border-radius:8px;
+  cursor:pointer;
+  border: 1px solid rgba(120,140,130,0.12);
+  box-shadow: 0 4px 12px rgba(50,70,60,0.06);
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.thumb:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 10px 26px rgba(50,70,60,0.08); }
+
+/* 追加枚数表示 */
+.more-count {
+  position:absolute;
+  bottom:8px;
+  right:8px;
+  background: rgba(127,187,169,0.95);
+  color:#fff;
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  box-shadow: 0 6px 14px rgba(127,187,169,0.12);
 }
 
-/* コメント入力欄 */
-.caption-area {
-    text-align: left;
-    margin-bottom: 20px;
+/* モーダル（画像拡大） */
+.modal {
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: linear-gradient(180deg, rgba(14,30,25,0.28), rgba(14,30,25,0.48));
+  z-index:1000;
+  padding:20px;
+}
+.modal-content {
+  background: var(--card);
+  padding:16px;
+  border-radius:14px;
+  max-width:900px;
+  max-height:90vh;
+  overflow:auto;
+  position:relative;
+  box-shadow: 0 20px 50px rgba(20,40,35,0.18);
+}
+.modal-content img {
+  display:block;
+  max-width:100%;
+  height:auto;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+.modal-content .caption {
+  margin:0;
+  color:#3b4b46;
+  font-size:14px;
 }
 
-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    resize: vertical;
-    min-height: 80px;
-    box-sizing: border-box;
+/* 閉じるボタン */
+.close {
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:transparent;
+  border:none;
+  font-size:18px;
+  cursor:pointer;
+  color:#4a5b55;
 }
 
-/* 投稿ボタン */
-#submit-button {
-    width: 100%;
-    padding: 15px;
-    background-color: #38A169; /* 緑色のボタン */
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.2em;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-/* ボタンが押せないとき（無効）の見た目 */
-#submit-button:disabled {
-    background-color: #BEE3F8;
-    cursor: not-allowed;
-}
-
-#submit-button:not(:disabled):hover {
-    background-color: #2F855A;
-}
-
-/* ローディング画面 */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    color: #4a5568;
-    font-size: 1.2em;
-    font-weight: bold;
+/* レスポンシブ調整 */
+@media (max-width:760px) {
+  .diary-root { padding:14px; }
+  .calendar thead th { font-size:12px; }
+  .thumb { width:34px; height:34px; border-radius:6px; }
+  .more-count { font-size:11px; padding:3px 6px; bottom:6px; right:6px; }
 }
