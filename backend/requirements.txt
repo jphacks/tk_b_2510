@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+supabase
+google-genai
+python-dotenv
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
