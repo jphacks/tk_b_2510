@@ -10,7 +10,7 @@ export default function Footer() {
         <Link href="/login" style={{ margin: '0 10px' }}>
             ログイン
         </Link>
-        <Link href="/photo" style={{ margin: '0 10px' }}>
+        <Link href="/post" style={{ margin: '0 10px' }}>
             投稿ページ
         </Link>
         <Link href="/settings" style={{ margin: '0 10px' }}>
@@ -19,7 +19,7 @@ export default function Footer() {
         <Link href="/diary" style={{ margin: '0 10px' }}>
             日記ページ
         </Link>
-        <Link href="/home" style={{ margin: '0 10px' }}>
+        <Link href="/user-home" style={{ margin: '0 10px' }}>
             ホーム
         </Link>
         {/* 他のページリンクもここに追加 */}

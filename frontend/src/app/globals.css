@@ -1,17 +1,15 @@
 @import "tailwindcss";
 
 :root {
+  --header-height: 96px; /* ヘッダー高さをここで管理 */
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
+/* ダークモード */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,6 +17,7 @@
   }
 }
 
+/* ページ全体 */
 html, body, #root, #__next, main {
     height: 100%;
 }
@@ -28,5 +27,229 @@ body {
     -moz-osx-font-smoothing: grayscale;
     background: var(--background);
     color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+/* コンテナ */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 20px;
+  /* ヘッダーを固定した分だけ上余白を確保（header高さに合わせて調整） */
+  padding-top: calc(var(--header-height) + 24px);
+}
+
+/* ヘッダー（全幅ピンク背景 + 一本のボーダー） */
+.app-header {
+  position: fixed; /* ページ上部に常に固定して最前面にする */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999; /* 最前面に */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff0f6; /* 薄いピンク */
+  height: var(--header-height);
+  padding: 0 18px; /* 高さは height で管理、左右の余白のみ指定 */
+  box-sizing: border-box;
+}
+
+/* ヘッダー下のフル幅一本線（高さ1px） */
+.app-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,77,166,0.18), rgba(138,43,226,0.12));
+  pointer-events: none;
+}
+
+/* ヘッダー（上部ピンク帯） */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #e7aee6; /* ヘッダー全体の淡いピンク */
+  z-index: 9999;
+  box-sizing: border-box;
+  padding: 0 18px;
+  border-bottom: 1px solid #222; /* ヘッダー下の一本線 */
+}
+
+/* タイトルの箱（中央・枠線） */
+.title.cute-title {
+  font-family: "Georgia", "Hiragino Mincho ProN", serif;
+  font-size: 72px;
+  line-height: 1;
+  font-weight: 300;
+  color: #1a1a1a;
+  background: rgba(255,255,255,0.85); /* ヘッダー内で少し明るい箱 */
+  padding: 6px 28px;
+  border: 2px solid #1a1a1a;
+  border-radius: 4px;
+  display: inline-block;
+  box-shadow: none;
+  margin: 0;
+}
+
+/* タイトル: Emolog */
+.title.cute-title {
+  font-size: 3rem; /* 48px */
+  font-weight: 800;
+  font-family: "Helvetica Neue", "Noto Sans JP", "Yu Gothic", "Meiryo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #ff4da6;
+  background: transparent; /* ヘッダー背景と揃える */
+  border: none;
+  padding: 8px 28px;
+  margin: 0;
+  display: inline-block;
+}
+
+/* キャッチコピー等 */
+.tagline-small {
+  font-size: 1.25rem;
+  color: #000;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.tagline-large {
+  font-size: 2.5rem;
+  color: #000;
+  font-weight: 600;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 40px;
+}
+
+.description {
+  font-size: 1rem;
+  color: #000;
+  line-height: 1.7;
+  padding-left: 20px;
+}
+
+/* レイアウト：本文・ナビ */
+.content-wrapper {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* 左カラム（本文） */
+.main-content {
+  flex: 1 1 65%;
+  text-align: left;
+  padding-left: 36px; /* タイトル位置と揃えるための余白 */
+}
+
+/* キャッチコピー（上段：左寄せ） */
+.tagline {
+  font-size: 36px;
+  margin: 8px 0 12px 0;
+  color: #111;
+  text-align: left;
+}
+
+/* キャッチコピー（下段：目立たせる / 中央寄せ） */
+.tagline-large {
+  font-size: 48px;
+  margin: 18px 0 28px 0;
+  text-align: center;
+  color: #111;
+  font-weight: 500;
+}
+
+/* 右カラム（ナビ） */
+.navigation {
+  flex: 0 0 24%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-top: 36px;
+  gap: 12px;
+}
+
+/* Login ボタン見た目 */
+.login-button {
+  display: inline-block;
+  background: #0f5f6f;
+  color: #fff;
+  padding: 12px 36px;
+  border-radius: 2px;
+  border: 2px solid #133;
+  font-size: 28px;
+  letter-spacing: 1px;
+  text-decoration: none;
+  line-height: 1;
+}
+
+/* モバイル調整 */
+@media (max-width: 768px) {
+  /* ヘッダー高さを小さくする */
+  :root { --header-height: 72px; }
+  .container { padding-top: calc(var(--header-height) + 16px); }
+
+  .content-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .main-content {
+    text-align: center;
+    padding-left: 0;
+  }
+
+  .description {
+    text-align: left;
+    padding: 0 10px;
+  }
+
+  .navigation {
+    align-items: center;
+    width: 100%;
+    margin-top: 30px;
+    padding-top: 0;
+  }
+
+  .login-button {
+    width: 80%;
+    text-align: center;
+  }
+
+  /* ヘッダー高さに合わせて上余白を調整 */
+  .container {
+    padding-top: 88px; /* モバイル向けに少し小さめに調整 */
+  }
+
+  .title.cute-title {
+    font-size: 2.4rem;
+    padding: 6px 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .title.cute-title { font-size: 48px; padding: 6px 16px; }
+  .main-content { padding-left: 20px; }
+  .tagline { font-size: 32px; }
+  .tagline-large { font-size: 32px; }
+  .navigation { align-items: center; flex-basis: auto; width: 100%; padding-top: 16px; }
+  .login-button { font-size: 20px; padding: 10px 24px; }
+  .content-wrapper { flex-direction: column; gap: 18px; }
+  .container { padding-top: calc(var(--header-height) + 18px); }
 }
