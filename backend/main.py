@@ -96,10 +96,8 @@ async def analyze_and_save_diary(
             "日記の最後は『素敵な一日でした。』で締めくくってください。"
         )
 
-        response = gemini_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=[image_part, prompt],
-        )
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        response = model.generate_content([image_part, prompt])
         generated_comment = response.text.strip()
     except Exception as e:
         # Gemini処理失敗時の処理
