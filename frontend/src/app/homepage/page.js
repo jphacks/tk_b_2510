@@ -28,9 +28,13 @@ export default function HomePage() {
         </header>
       <main className={styles.mainGrid}>
         <aside className={styles.userPanel}>
-          <div className={styles.userAvatar} aria-hidden>U</div>
-          <h2 className={styles.userName}>{username}</h2>
-          <p className={styles.userMeta}>投稿数: 12</p>
+          <div className={styles.modalWrap}>
+            <div className={styles.modalCard} role="region" aria-labelledby="user-card">
+              <div className={styles.userAvatar} aria-hidden>U</div>
+              <h2 className={styles.userName} id="user-card">{username}</h2>
+              <p className={styles.userMeta}>投稿数: 12</p>
+            </div>
+          </div>
         </aside>
 
         <section className={styles.streakColumn}>
@@ -46,8 +50,22 @@ export default function HomePage() {
         </section>
       </main>
         <footer>
-        
-        </footer>
+          <div className={styles.footerGrass} role="contentinfo" aria-label="footer grass">
+              {Array.from({ length: 30 }).map((_, i) => {
+                const grown = i < Math.min(30, Math.max(0, streakDays));
+                return (
+                  <img
+                    key={i}
+                    src="/images/grass.png"
+                    className={`${styles.grassImg} ${grown ? styles.grown : ''}`}
+                    alt=""
+                    aria-hidden
+                    style={{ animationDelay: `${(i % 6) * 80}ms` }}
+                  />
+                );
+              })}
+            </div>
+          </footer>
     </>
   );
 }
