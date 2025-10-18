@@ -1,5 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+// ------------------------------------------------------------------
+// 📁 components/Footer.js から Footer コンポーネントをインポートします
+import Footer from '../components/Footer'; 
+// ------------------------------------------------------------------
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,7 +26,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        {children} {/* 各ページのコンテンツがここに表示されます */}
+        {/* ------------------------------------------------------ */}
+        <Footer /> {/* 全てのページに共通のフッターを追加します */}
+        {/* ------------------------------------------------------ */}
       </body>
     </html>
   );
