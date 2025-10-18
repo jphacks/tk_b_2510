@@ -67,6 +67,54 @@
   cursor: default;
 }
 
+.actions{
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.button{
+  margin-top: 18px;
+  background: var(--accent);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent; /* make same border-box as secondary */
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 42px; /* fixed height to keep alignment */
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.button:disabled{
+  opacity: 0.6;
+  cursor: default;
+}
+
+.secondary{
+  background: none;
+  border: 1px solid #e6e9ef;
+  color: #0f172a;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 42px; /* match primary */
+}
+
+.secondary:focus-visible{ outline: 2px solid rgba(37,99,235,0.2); outline-offset:2px }
+
 .error{
   margin-top: 10px;
   color: var(--danger);

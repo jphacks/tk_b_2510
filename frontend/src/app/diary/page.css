@@ -1,0 +1,114 @@
+/* PostPage.css */
+
+/* ページ全体 */
+body {
+    font-family: sans-serif;
+    background-color: #f0f0f5; /* 淡いグレーの背景色 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* フォームの入れ物（カード） */
+.post-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 500px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+h2 {
+    color: #4a5568;
+    margin-bottom: 25px;
+}
+
+/* 写真選択ボタン */
+.upload-label {
+    display: block;
+    padding: 20px;
+    background-color: #5A67D8; /* 青色のメインカラー */
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: background-color 0.2s;
+}
+
+.upload-label:hover {
+    background-color: #434190;
+}
+
+/* プレビュー画像 */
+.preview-image {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 2px solid #5A67D8; /* 枠線 */
+}
+
+/* コメント入力欄 */
+.caption-area {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 80px;
+    box-sizing: border-box;
+}
+
+/* 投稿ボタン */
+#submit-button {
+    width: 100%;
+    padding: 15px;
+    background-color: #38A169; /* 緑色のボタン */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* ボタンが押せないとき（無効）の見た目 */
+#submit-button:disabled {
+    background-color: #BEE3F8;
+    cursor: not-allowed;
+}
+
+#submit-button:not(:disabled):hover {
+    background-color: #2F855A;
+}
+
+/* ローディング画面 */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    color: #4a5568;
+    font-size: 1.2em;
+    font-weight: bold;
+}
