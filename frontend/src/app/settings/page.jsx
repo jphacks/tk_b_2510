@@ -4,6 +4,7 @@
 
 import React from 'react';
 import './page.css'; // CSSファイルをインポート
+import AuthGuard from '../../lib/AuthGuard';
 
 // 歯車アイコン
 const SettingsIcon = ({ onClick }) => {
@@ -321,4 +322,10 @@ const MyProfile = () => {
     );
 };
 
-export default MyProfile;
+export default function SettingsWrapper() {
+  return (
+    <AuthGuard>
+      <MyProfile />
+    </AuthGuard>
+  );
+}
