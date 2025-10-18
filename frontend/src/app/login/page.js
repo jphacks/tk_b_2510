@@ -60,7 +60,7 @@ export default function LoginPage() {
           placeholder="パスワード"
         />
 
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div role="alert" className={styles.error}>{error}</div>}
 
         <button className={styles.button} type="submit" disabled={loading}>{loading ? "送信中..." : "ログイン"}</button>
 
