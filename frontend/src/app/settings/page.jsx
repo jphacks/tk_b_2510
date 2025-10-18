@@ -5,6 +5,8 @@
 import React from 'react';
 import './page.css'; // CSSファイルをインポート
 import AuthGuard from '../../lib/AuthGuard';
+import { supabase } from '../../lib/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 // 歯車アイコン
 const SettingsIcon = ({ onClick }) => {
@@ -69,6 +71,26 @@ const SettingsPage = ({ onGoBack }) => {
         });
         setIsChangingPassword(false);
     };
+
+    const handleLogout = async () => {
+        if (confirm('本当にログアウトしますか？')) {
+            try {
+                // 1. Supabaseからログアウト
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                
+                // 2. localStorageのアクセストークンを削除 (AuthGuardでフォールバックとして使っているため)
+                localStorage.removeItem('access_token');
+
+                // 3. ログインページへリダイレクト
+                router.push('/login');
+            } catch (error) {
+                console.error('Logout failed:', error);
+                alert(`ログアウトに失敗しました: ${error.message}`);
+            }
+        }
+    };
+    // -----------------------------------
 
     return (
         <div className="content-container">
@@ -151,6 +173,19 @@ const SettingsPage = ({ onGoBack }) => {
                     </label>
                 </div>
                 
+                {/* --- 変更4: ログアウト項目を追加 --- */}
+                <div className="settings-item">
+                    <h3>ログアウト</h3>
+                    <p>現在のセッションからサインアウトします。</p>
+                    <button 
+                        className="settings-danger-button" // 危険な操作ボタンのスタイルを再利用
+                        onClick={handleLogout}
+                    >
+                        ログアウト
+                    </button>
+                </div>
+                {/* ---------------------------------- */}
+
                 {/* アカウント削除 */}
                 <div className="settings-item" style={{borderBottom: 'none'}}>
                     <h3>アカウント削除</h3>
