@@ -32,7 +32,7 @@ app.add_middleware(
 )
 
 # GeminiとSupabaseクライアントの初期化
-gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
 
 # Supabaseクライアントを依存性注入で使用
 def get_supabase_client() -> SupabaseClient:
