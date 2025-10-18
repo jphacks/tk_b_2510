@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import styles from "./page.module.css";
+import { supabase } from "../../lib/supabaseClient";
+// next/navigationからuseRouterをインポート
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter(); // useRouterフックを使用可能にする
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -35,35 +40,41 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || "ログインに失敗しました");
-      }
-
-      const data = await res.json();
-      // 受け取ったトークンを localStorage に保存
-      if (data.access_token) {
-        localStorage.setItem("access_token", data.access_token);
-        // 簡易的にホームへリダイレクト
-        window.location.href = "/";
+      if (isSignup) {
+        // サインアップ
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (signUpError) throw signUpError;
+        // サインアップ後はメール確認などがあるため、そのままログイン画面へ
+        alert('アカウントを作成しました。メール確認後ログインしてください。');
+        setIsSignup(false);
+        setPassword("");
+        setConfirmPassword("");
+        return;
       } else {
-        throw new Error("トークンが返却されませんでした");
+        // サインイン
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (signInError) throw signInError;
+
+        // 保存: access token は session オブジェクトから取得
+        if (data && data.session && data.session.access_token) {
+          localStorage.setItem('access_token', data.session.access_token);
+          // リダイレクト先を/homeに変更
+          router.push('/home');
+        } else {
+          throw new Error('ログインに失敗しました');
+        }
       }
     } catch (err) {
       console.error(err);
-      setError(err.message || "ログイン中にエラーが発生しました");
+      setError(err.message || err.toString() || "ログイン中にエラーが発生しました");
     } finally {
       setLoading(false);
-
     }
   }
 
