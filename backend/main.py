@@ -112,7 +112,6 @@ async def analyze_and_save_diary(
             "user_id": user_id,
             "image_url": image_url,
             "comment": generated_comment,
-            "date": "NOW()", # DB側で日時を自動挿入する場合の例
         }).execute()
         
         # 挿入されたレコードのIDを取得
