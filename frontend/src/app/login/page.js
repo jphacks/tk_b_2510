@@ -6,8 +6,10 @@ import styles from "./page.module.css";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
 
   function validate() {
     if (!email) return "メールアドレスを入力してください";
@@ -15,6 +17,10 @@ export default function LoginPage() {
     if (!emailRe.test(email)) return "有効なメールアドレスを入力してください";
     if (!password) return "パスワードを入力してください";
     if (password.length < 6) return "パスワードは6文字以上で入力してください";
+    if (isSignup) {
+      if (!confirmPassword) return "確認用パスワードを入力してください";
+      if (password !== confirmPassword) return "パスワードが一致しません";
+    }
     return "";
   }
 
@@ -37,6 +43,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
+
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.detail || "ログインに失敗しました");
@@ -56,13 +63,14 @@ export default function LoginPage() {
       setError(err.message || "ログイン中にエラーが発生しました");
     } finally {
       setLoading(false);
+
     }
   }
 
   return (
     <div className={styles.wrapper}>
       <form className={styles.card} onSubmit={handleSubmit}>
-        <h1 className={styles.title}>ログイン</h1>
+        <h1 className={styles.title}>{isSignup ? "新規アカウント作成" : "ログイン"}</h1>
 
         <label className={styles.label} htmlFor="email">メールアドレス</label>
         <input
@@ -84,17 +92,44 @@ export default function LoginPage() {
           placeholder="パスワード"
         />
 
+        {isSignup && (
+          <>
+            <label className={styles.label} htmlFor="confirm">パスワード（確認）</label>
+            <input
+              id="confirm"
+              type="password"
+              className={styles.input}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="もう一度パスワードを入力"
+            />
+          </>
+        )}
+
         {error && <div role="alert" className={styles.error}>{error}</div>}
 
-        <button
-          className={styles.button}
-          type="submit"
-          disabled={loading}
-          aria-disabled={loading}
-          aria-busy={loading}
-        >
-          {loading ? "送信中..." : "ログイン"}
-        </button>
+        <div className={styles.actions}>
+          <button
+            className={styles.button}
+            type="submit"
+            disabled={loading}
+            aria-disabled={loading}
+            aria-busy={loading}
+          >
+            {loading ? "送信中..." : isSignup ? "アカウント作成" : "ログイン"}
+          </button>
+
+          <button
+            type="button"
+            className={styles.secondary}
+            onClick={() => {
+              setIsSignup((s) => !s);
+              setError("");
+            }}
+          >
+            {isSignup ? "ログイン画面に戻る" : "新規アカウント作成"}
+          </button>
+        </div>
 
         <div className={styles.footer}>
           <button type="button" className={styles.link} onClick={() => alert('仮のパスワード再発行リンク')}>パスワードを忘れた場合</button>
