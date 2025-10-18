@@ -145,30 +145,32 @@ def read_root():
     return {"status": "ok", "service": "Emolog Backend"}
 
 # -----------------
-# 6. (不足) 日記表示用のAPI (P2タスク)
+# 6. 日記表示用のAPI (P2タスク)
 # -----------------
+
 @app.get("/photos")
 async def get_user_diaries(user_id: str):
     """
-    指定されたユーザーIDの全投稿（写真とAI分析結果）をDBから取得するエンドポイント。
+    指定されたユーザーIDの全投稿（写真とAI分析結果）をDBから取得し、URLをそのまま使用する。
     """
     try:
-        # Supabaseの'posts'テーブルから、指定された user_id のデータを取得
-        # 最新の投稿が上になるように created_at で降順ソート
+        # DBから投稿データを取得
+        # 'image_url' には公開 URL が保存されている前提とする
         res = supabase.table("posts").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
         
-        # 取得したデータをフロントエンドが期待する形式に整形
         photos_data = []
+
         for post in res.data:
-            # created_at の形式から日付部分 (YYYY-MM-DD) のみを抽出
             date_obj = post.get("created_at")
             date_only = date_obj.split(" ")[0] if date_obj else time.strftime("%Y-%m-%d")
+            
+            # 💡 修正: データベースに保存されている Public URL (image_url) をそのまま使用
+            final_image_url = post["image_url"] 
 
             photos_data.append({
                 "id": post["id"],
-                "date": date_only, # YYYY-MM-DD 形式
-                "url": post["image_url"],
-                # AIの感情とコメントを結合してキャプションとして利用
+                "date": date_only, 
+                "url": final_image_url,
                 "caption": f"AI分析: {post.get('emotion', 'N/A')} - {post.get('comment', 'N/A')}",
             })
         
@@ -177,3 +179,33 @@ async def get_user_diaries(user_id: str):
     except Exception as e:
         print(f"Error fetching diaries: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch diary data: {str(e)}")
+    
+# jphacks/tk_b_2510/.../backend/main.py
+
+# -----------------
+# 9. ユーザー統計情報取得API (P4タスク)
+# -----------------
+@app.get("/user-stats")
+async def get_user_stats(user_id: str):
+    """
+    指定されたユーザーIDの投稿数を取得する。
+    連続投稿日数の計算は複雑なため、一旦フロントエンドのモック値を維持する。
+    """
+    try:
+        # Supabaseの'posts'テーブルから、指定された user_id の投稿数をカウント
+        # select('*', count='exact') で件数を取得し、データ本体は取得しない
+        res = supabase.table("posts").select("id", count="exact").eq("user_id", user_id).execute()
+        
+        post_count = res.count # exact count を取得
+        
+        # 連続投稿日数は、まだサーバーサイドでの正確な計算が複雑なため、
+        # フロントエンドがモック値を使用できるように 365 を返却
+        return {
+            "post_count": post_count,
+            "streak_days": 365 # 仮の値 (フロントエンドのモック値に依存)
+        }
+
+    except Exception as e:
+        print(f"Error fetching user stats: {e}")
+        # エラー時は 0 を返す
+        raise HTTPException(status_code=500, detail=f"Failed to fetch user stats: {str(e)}")

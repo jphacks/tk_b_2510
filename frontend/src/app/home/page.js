@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import styles from './page.module.css';
+import styles from './page.module.css'; // 💡 CSS Modules のインポートはこれが正しい
 import AuthGuard from '../../lib/AuthGuard';
-import { supabase } from '../../lib/supabaseClient'; // 👈 supabaseをインポート
+import { supabase } from '../../lib/supabaseClient'; 
 
 function HomeContent() {
-  const [username, setUsername] = useState('あなた'); // デフォルト値
+  const [username, setUsername] = useState('あなた'); 
   const [userEmail, setUserEmail] = useState('未認証');
   const [userIdShort, setUserIdShort] = useState('---');
-  const [postCount, setPostCount] = useState(12); // ハードコード値を維持（P4-1でAPI連携予定）
-  const [streakDays, setStreakDays] = useState(365); // ハードコード値を維持
+  const [postCount, setPostCount] = useState(12); 
+  const [streakDays, setStreakDays] = useState(365); 
 
   // 💡 ユーザーセッションと情報を取得する
   useEffect(() => {
@@ -20,16 +20,30 @@ function HomeContent() {
       
       if (session && session.user) {
         const user = session.user;
+        const userId = user.id; // ユーザーIDを取得
         const shortId = user.id.substring(0, 8) + '...';
-        
-        // ユーザー名としてメールアドレスの@以前の部分を使用（暫定）
         const namePart = user.email ? user.email.split('@')[0] : 'ユーザー';
         
         setUsername(namePart);
         setUserEmail(user.email);
         setUserIdShort(shortId);
         
-        // ローカルストレージに名前を保存する元のロジックは削除し、Supabaseを信頼
+        // --- 💡 ユーザー統計情報の取得 ---
+        const API_ENDPOINT = `http://localhost:8000/user-stats?user_id=${encodeURIComponent(userId)}`;
+
+        try {
+            const res = await fetch(API_ENDPOINT);
+            if (res.ok) {
+                const stats = await res.json();
+                setPostCount(stats.post_count); 
+                setStreakDays(stats.streak_days); 
+            } else {
+                console.error("Failed to fetch user stats:", res.status);
+            }
+        } catch (error) {
+            console.error("API connection error for user stats:", error);
+        }
+        // --- 💡 追加ここまで ---
       }
     };
 
