@@ -1,6 +1,8 @@
 import os
 import io
-from fastapi import FastAPI, UploadFile, HTTPException, Depends
+import time
+import json # JSON解析のためにインポート
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client as SupabaseClient
 from google import genai
@@ -10,8 +12,10 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 import logging
+# PIL (Pillow) をインポートに追加
+from PIL import Image
 
-# --- JWT 設定 ---
+# --- JWT 設定 (フロントエンドがSupabase Authを使用しているため、このブロックは不要だが、一旦保持) ---
 SECRET_KEY = os.environ.get("JWT_SECRET", "dev-secret")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7日
@@ -48,20 +52,18 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 # --- 1. 環境設定と初期化 ---
-# .envファイルなどで管理することを推奨
-# 環境変数からAPIキーやURLを読み込む
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-BUCKET_NAME = "diary_images" # Supabase Storageで使うバケット名
+BUCKET_NAME = "post_photos" # Supabase Storageで使うバケット名
 
 # FastAPIアプリケーションのインスタンス作成
 app = FastAPI()
 
 # CORS設定（Next.jsフロントエンドからのアクセスを許可）
 origins = [
-    "http://localhost:3000",  # Next.js開発サーバーのオリジン
-    # "https://your-frontend-domain.vercel.app", # デプロイ後のオリジン
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
@@ -72,15 +74,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# GeminiとSupabaseクライアントの初期化
-gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+# Geminiクライアントの初期化 (APIキーがない場合は後続でエラーを出す)
+try:
+    gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+except Exception as e:
+    logging.error(f"Gemini client initialization failed: {e}")
 
 # Supabaseクライアントを依存性注入で使用
 def get_supabase_client() -> SupabaseClient:
-    """Supabaseクライアントを返す"""
-    if not SUPABASE_URL or not SUPABASE_KEY:
+    """Supabaseクライアントを返し、環境変数がない場合はエラーを発生させる"""
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
         raise HTTPException(status_code=500, detail="Supabase環境変数が設定されていません")
-    return create_client(SUPABASE_URL, SUPABASE_KEY)
+    return create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 
 # --- 2. レスポンスのデータモデル定義 (Pydantic) ---
@@ -88,10 +93,10 @@ class DiaryResponse(BaseModel):
     """フロントエンドに返すデータの構造"""
     comment: str
     image_url: str
-    diary_id: int
+    diary_id: str # IDをUUID型に対応させるため、strに変更
 
 
-# --- 認証用モデル ---
+# --- 認証用モデル (中略) ---
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -110,8 +115,8 @@ class LoginForm(BaseModel):
 @app.post("/analyze-and-save", response_model=DiaryResponse)
 async def analyze_and_save_diary(
     image: UploadFile, 
-    user_id: str,  # 認証後にフロントエンドから渡されると想定
-    supabase: SupabaseClient = Depends(get_supabase_client)
+    user_id: str = Form(...), # 💡 user_idをFormデータとして受け取る
+    supabase: SupabaseClient = Depends(get_supabase_client) # 💡 依存性注入
 ):
     """
     画像を処理し、Geminiで解析・コメント生成を行い、Supabaseに保存する。
@@ -133,75 +138,115 @@ async def analyze_and_save_diary(
         # 公開URLを取得
         image_url = supabase.storage.from_(BUCKET_NAME).get_public_url(file_path)
     except Exception as e:
-        # アップロード失敗時の処理
         raise HTTPException(status_code=500, detail=f"画像アップロード失敗: {e}")
 
     # 3.3. Gemini APIでの解析とコメント生成
     try:
-        # 画像データをBytesIOでラップし、Geminiに渡す
-        image_stream = io.BytesIO(file_contents)
-        image_part = genai.types.Part.from_bytes(
-            data=image_stream.read(),
-            mime_type=image.content_type
-        )
-
+        # Pillowを使って画像を読み込む
+        pil_image = Image.open(io.BytesIO(file_contents))
+        
         # プロンプト（AIへの指示）の定義
         prompt = (
-            "この画像から読み取れる感情や感性を分析し、"
-            "その日の出来事を記録するような、暖かくて短い日記コメントを100文字以内の日本語で生成してください。"
-            "日記の最後は『素敵な一日でした。』で締めくくってください。"
+            "あなたはプロの感情分析AIです。この写真を見て、ユーザーがどんな感情を抱いているか分析してください。"
+            "そして、その感情を表現する日記のコメントを、親しみやすい文体で日本語で30文字程度で生成してください。"
+            "回答は必ずJSON形式で、キーを 'emotion' (分析した感情), 'comment' (生成したコメント) としてください。"
+            "例: {\"emotion\": \"楽しそう\", \"comment\": \"最高の一日！こんな日はいつまでも続いてほしいな。\"}"
         )
 
         model = genai.GenerativeModel('gemini-2.5-flash')
-        response = model.generate_content([image_part, prompt])
-        generated_comment = response.text.strip()
+        response = model.generate_content([pil_image, prompt])
+        
+        # JSONレスポンスをパース
+        analysis_result = json.loads(response.text.strip())
+        emotion_text = analysis_result.get("emotion", "分析不能")
+        generated_comment = analysis_result.get("comment", "日記コメント生成失敗")
+
     except Exception as e:
-        # Gemini処理失敗時の処理
         print(f"Gemini APIエラー: {e}")
-        raise HTTPException(status_code=500, detail="AI解析中にエラーが発生しました。")
+        # 長文エラーを避けるため、一般的なエラーを返す
+        raise HTTPException(status_code=500, detail="AI解析中にエラーが発生しました。詳細はサーバーログを確認してください。")
 
     # 3.4. Supabase DBに結果を保存
     try:
-        data, count = supabase.table("diaries").insert({
+        # ⚠️ テーブル名を 'posts' に統一
+        data, count = supabase.table("posts").insert({
             "user_id": user_id,
             "image_url": image_url,
             "comment": generated_comment,
+            "emotion": emotion_text,
+            "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
         }).execute()
         
         # 挿入されたレコードのIDを取得
-        new_diary_id = data[0][0]['id'] 
+        # SupabaseのIDカラムをUUIDにした場合、'id'として取得される
+        new_diary_id = data[0][0]['id'] if data and data[0] and data[0][0] else None
 
     except Exception as e:
+        logging.error(f"DB保存失敗: {e}")
         raise HTTPException(status_code=500, detail=f"DB保存失敗: {e}")
 
     # 3.5. フロントエンドへのレスポンス
     return DiaryResponse(
         comment=generated_comment,
         image_url=image_url,
-        diary_id=new_diary_id
+        diary_id=new_diary_id if new_diary_id else "unknown"
     )
 
 
+# --- 4. 日記表示用API (P2タスク) ---
+@app.get("/api/photos")
+async def get_user_diaries(
+    user_id: str, # クエリパラメータとして user_id を受け取る
+    supabase: SupabaseClient = Depends(get_supabase_client) # 💡 依存性注入
+):
+    """
+    指定されたユーザーIDの日記エントリ（写真とコメント）をすべて取得する。
+    """
+    try:
+        # DBからデータを取得: 'posts'テーブルを使用
+        # 必要なカラム: id, image_url, comment(caption), created_at
+        result = supabase.table("posts").select(
+            "id, image_url, comment, created_at"
+        ).eq("user_id", user_id).order("created_at", desc=True).execute()
+
+        # result.data からレコードのリストを取得 (supabase-pyの新しいバージョンではdata[1]ではなく.dataを使うことがある)
+        data = result.data if hasattr(result, 'data') else result[1] 
+
+        # データをフロントエンドの期待する形式に変換
+        formatted_diaries = []
+        for item in data:
+            created_at_str = item["created_at"]
+            # YYYY-MM-DD 形式に変換
+            ymd_date = created_at_str.split('T')[0]
+            
+            formatted_diaries.append({
+                "id": item["id"],
+                "url": item["image_url"],
+                "date": ymd_date,
+                "caption": item["comment"],
+            })
+        
+        return formatted_diaries
+
+    except Exception as e:
+        # DB接続やクエリのエラーはここで捕捉
+        logging.error(f"Error fetching diaries for user {user_id}: {e}")
+        # 長文エラーを避けるため、一般的なエラーを返す
+        raise HTTPException(status_code=500, detail=f"日記データの取得中に予期せぬエラーが発生しました。詳細はサーバーログを確認してください。")
+
+
+# --- 5. 認証用エンドポイント (フロントエンドがSupabase Authを使用しているため、このブロックは不要だが、一旦保持) ---
 @app.post('/api/login', response_model=Token)
 async def login(form: LoginForm):
-    """
-    シンプルなログインエンドポイント。
-    - このサンプルではユーザー情報はハードコード/環境変数で管理します。
-    - 本番ではDBでユーザーを管理してください。
-    """
-    # テスト用ハードコードユーザ: 環境変数で上書き可能
+    # ... (既存の login ロジックは省略) ...
+    # このエンドポイントは、フロントエンドがSupabase認証を使用しているため、現在使用されていません。
+    # 削除を推奨します。
     demo_email = os.environ.get('DEMO_USER_EMAIL', 'user@example.com')
     demo_password_hash = os.environ.get('DEMO_USER_PASSWORD_HASH')
     demo_password_plain = os.environ.get('DEMO_USER_PASSWORD')
-
-    # パスワードハッシュが未指定で平文があればハッシュ化して使う
     if not demo_password_hash and demo_password_plain:
         demo_password_hash = get_password_hash(demo_password_plain)
-
-    # ここでは email と password を比較
-    # Always verify password, even if email is invalid, to avoid timing attacks
-    # Use a dummy hash if email does not match or password hash is missing
-    DUMMY_HASH = "$2b$12$C6UzMDM.H6dfI/f/IKcEeOe5F2bY6b2b1Z6b2b1Z6b2b1Z6b2b1Z6b2"  # bcrypt hash for "dummy"
+    DUMMY_HASH = "$2b$12$C6UzMDM.H6dfI/f/IKcEeOe5F2bY6b2b1Z6b2b1Z6b2b1Z6b2b1Z6b2"
     password_hash_to_check = demo_password_hash if form.email == demo_email and demo_password_hash else DUMMY_HASH
     if not verify_password(form.password, password_hash_to_check):
         raise HTTPException(status_code=401, detail='認証に失敗しました')
@@ -211,5 +256,10 @@ async def login(form: LoginForm):
     access_token = create_access_token(
         data={"sub": form.email}, expires_delta=access_token_expires
     )
-
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+# --- 6. ヘルスチェック ---
+@app.get("/")
+def read_root():
+    return {"status": "ok", "service": "Emolog Backend"}
