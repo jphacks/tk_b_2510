@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useMemo, useState } from 'react';
 import './page.css';
+import AuthGuard from '../../lib/AuthGuard';
 
 function formatYMD(date) {
     const y = date.getFullYear();
@@ -9,7 +10,7 @@ function formatYMD(date) {
     return `${y}-${m}-${d}`;
 }
 
-export default function DiaryPage() {
+function DiaryPage() {
     const today = new Date();
     const [year, setYear] = useState(today.getFullYear());
     const [month, setMonth] = useState(today.getMonth()); // 0-indexed
@@ -148,5 +149,14 @@ export default function DiaryPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+// export default wrapper to protect the diary route
+export default function DiaryPageWrapper() {
+    return (
+        <AuthGuard>
+            <DiaryPage />
+        </AuthGuard>
     );
 }

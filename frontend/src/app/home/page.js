@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
+import AuthGuard from "../../lib/AuthGuard";
 
-export default function HomePage() {
+function HomeContent() {
   const [username, setUsername] = useState('あなた');
   const [streakDays, setStreakDays] = useState(365);
 
@@ -49,5 +50,13 @@ export default function HomePage() {
         
         </footer>
     </>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <AuthGuard>
+      <HomeContent />
+    </AuthGuard>
   );
 }

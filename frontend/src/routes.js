@@ -9,7 +9,7 @@ export const appRoutes = [
   },
   {
     path: '/photo',
-    name: '写真一覧',
+    name: '写真投稿',
   },
   {
     path: '/settings',
