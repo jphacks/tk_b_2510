@@ -188,12 +188,14 @@ async def login(form: LoginForm):
         demo_password_hash = get_password_hash(demo_password_plain)
 
     # ここでは email と password を比較
+    # Always verify password, even if email is invalid, to avoid timing attacks
+    # Use a dummy hash if email does not match or password hash is missing
+    DUMMY_HASH = "$2b$12$C6UzMDM.H6dfI/f/IKcEeOe5F2bY6b2b1Z6b2b1Z6b2b1Z6b2b1Z6b2"  # bcrypt hash for "dummy"
+    password_hash_to_check = demo_password_hash if form.email == demo_email and demo_password_hash else DUMMY_HASH
+    if not verify_password(form.password, password_hash_to_check):
+        raise HTTPException(status_code=401, detail='認証に失敗しました')
     if form.email != demo_email or not demo_password_hash:
         raise HTTPException(status_code=401, detail='認証に失敗しました')
-
-    if not verify_password(form.password, demo_password_hash):
-        raise HTTPException(status_code=401, detail='認証に失敗しました')
-
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": form.email}, expires_delta=access_token_expires
