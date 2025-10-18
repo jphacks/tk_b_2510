@@ -2,13 +2,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import './page.css';
 
-const samplePhotos = [
-    { id: '1', url: '/photo/2025-10-01_1.jpg', date: '2025-10-01', caption: '朝の散歩' },
-    { id: '2', url: '/photo/2025-10-01_2.jpg', date: '2025-10-01', caption: '公園' },
-    { id: '3', url: '/photo/2025-10-03_1.jpg', date: '2025-10-03', caption: '友達と' },
-    { id: '4', url: '/photo/2025-09-28_1.jpg', date: '2025-09-28', caption: '夕焼け' },
-];
-
 function formatYMD(date) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -22,17 +15,34 @@ export default function DiaryPage() {
     const [month, setMonth] = useState(today.getMonth()); // 0-indexed
     const [photos, setPhotos] = useState([]);
     const [selected, setSelected] = useState(null);
+    const [error, setError] = useState(null); // 追加
 
     useEffect(() => {
         let mounted = true;
         (async () => {
             try {
                 const res = await fetch('/api/photos');
-                if (!res.ok) throw new Error('no api');
+                if (!res.ok) {
+                    // APIがエラーを返した場合は例外で落とさずにハンドリングする
+                    const text = await res.text().catch(() => null);
+                    console.warn('fetch /api/photos failed', res.status, text);
+                    if (mounted) {
+                        setPhotos([]);
+                        setError(text || `API error: ${res.status}`);
+                    }
+                    return;
+                }
                 const data = await res.json();
-                if (mounted) setPhotos(data);
-            } catch {
-                if (mounted) setPhotos(samplePhotos);
+                if (mounted) {
+                    setPhotos(data);
+                    setError(null);
+                }
+            } catch (err) {
+                console.error(err);
+                if (mounted) {
+                    setPhotos([]);
+                    setError(err.message || 'fetch error');
+                }
             }
         })();
         return () => { mounted = false; };
@@ -83,6 +93,12 @@ export default function DiaryPage() {
                 <h2>{year}年 {month + 1}月</h2>
                 <button onClick={nextMonth} aria-label="次の月">▶</button>
             </header>
+
+            {error && (
+                <div className="api-error" style={{ color: 'crimson', padding: 8 }}>
+                    サーバーから写真を取得できませんでした: {error}
+                </div>
+            )}
 
             <table className="calendar">
                 <thead>
