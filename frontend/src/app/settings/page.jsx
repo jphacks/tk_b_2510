@@ -5,6 +5,8 @@
 import React from 'react';
 import './page.css'; // CSSファイルをインポート
 import AuthGuard from '../../lib/AuthGuard';
+import { supabase } from '../../lib/supabaseClient'; // 💡 追加: Supabaseクライアントをインポート
+import { useRouter } from 'next/navigation'; // 💡 追加: useRouterをインポート
 
 // 歯車アイコン
 const SettingsIcon = ({ onClick }) => {
@@ -34,6 +36,7 @@ const SettingsIcon = ({ onClick }) => {
 
 // 設定画面コンポーネント（パスワード変更フォーム追加）
 const SettingsPage = ({ onGoBack }) => {
+    const router = useRouter(); // 💡 追加: useRouterを初期化
     const [isChangingPassword, setIsChangingPassword] = React.useState(false);
     const [passwordData, setPasswordData] = React.useState({
         currentPassword: '',
@@ -69,6 +72,27 @@ const SettingsPage = ({ onGoBack }) => {
         });
         setIsChangingPassword(false);
     };
+
+    // 💡 ログアウト処理の追加
+    const handleLogout = async () => {
+        if (confirm('本当にログアウトしますか？')) {
+            try {
+                // 1. Supabaseからログアウト
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                
+                // 2. localStorageのアクセストークンを削除 (AuthGuardでフォールバックとして使っているため)
+                localStorage.removeItem('access_token');
+
+                // 3. ログインページへリダイレクト
+                router.push('/login');
+            } catch (error) {
+                console.error('Logout failed:', error);
+                alert(`ログアウトに失敗しました: ${error.message}`);
+            }
+        }
+    };
+    // -----------------------------------
 
     return (
         <div className="content-container">
@@ -151,8 +175,21 @@ const SettingsPage = ({ onGoBack }) => {
                     </label>
                 </div>
                 
-                {/* アカウント削除 */}
-                <div className="settings-item" style={{borderBottom: 'none'}}>
+                {/* 💡 ログアウト項目を追加 */}
+                <div className="settings-item">
+                    <h3>ログアウト</h3>
+                    <p>現在のセッションからサインアウトします。</p>
+                    <button 
+                        className="settings-danger-button"
+                        onClick={handleLogout}
+                    >
+                        ログアウト
+                    </button>
+                </div>
+                {/* ---------------------------------- */}
+                
+                {/* アカウント削除 (💡 style={{borderBottom: 'none'}} を削除し、CSSに任せます) */}
+                <div className="settings-item">
                     <h3>アカウント削除</h3>
                     <p>アカウントを完全に削除します。</p>
                     <button 
