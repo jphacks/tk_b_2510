@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 import './page.css';
 import AuthGuard from '../../lib/AuthGuard';
+import { supabase } from '../../lib/supabaseClient'; // 💡 supabaseをインポートに追加
 
 function formatYMD(date) {
     const y = date.getFullYear();
@@ -42,9 +43,20 @@ function DiaryPage() {
         let mounted = true;
         (async () => {
             try {
-                const res = await fetch('/api/photos');
+                // 1) supabase から現在のユーザーを取得
+                const { data } = await supabase.auth.getUser();
+                const user = data?.user || null;
+                if (!user) {
+                    if (mounted) setError('認証されていません。ログインしてください。');
+                    return;
+                }
+                const userId = user.id;
+
+                // 2) user_id をクエリに含めて API を呼ぶ
+                const API_ENDPOINT = `/api/photos?user_id=${encodeURIComponent(userId)}`;
+                const res = await fetch(API_ENDPOINT);
+
                 if (!res.ok) {
-                    // APIがエラーを返した場合は例外で落とさずにハンドリングする
                     const text = await res.text().catch(() => null);
                     console.warn('fetch /api/photos failed', res.status, text);
                     if (mounted) {
@@ -53,9 +65,9 @@ function DiaryPage() {
                     }
                     return;
                 }
-                const data = await res.json();
+                const dataJson = await res.json();
                 if (mounted) {
-                    setPhotos(data);
+                    setPhotos(dataJson);
                     setError(null);
                 }
             } catch (err) {
@@ -67,7 +79,7 @@ function DiaryPage() {
             }
         })();
         return () => { mounted = false; };
-    }, []);
+    }, []); // 初期ロード時のみ実行
 
     // helper: load image with CORS handling (may taint canvas if CORS not allowed)
     async function loadImage(url) {

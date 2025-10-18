@@ -1,9 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-// ⚠️ 実際のパスに合わせてください
 import { supabase } from '../../lib/supabaseClient';
-import './page.css'; // 見た目（CSS）を読み込みます
+import './page.css'; 
 import AuthGuard from '../../lib/AuthGuard';
+
+const API_ENDPOINT = 'http://localhost:8000/analyze-and-save'; 
 
 const PostPage = () => {
     // ページの状態（選んだ写真、コメントなど）を覚えるための箱を用意
@@ -48,7 +49,7 @@ const PostPage = () => {
         }
     };
 
-    // 投稿ハンドラ (Supabase実装)
+    // 投稿ハンドラ (FastAPI連携実装)
     const handleSubmit = async () => {
         if (!selectedFile) {
             alert('写真をアップロードしてください。');
@@ -62,53 +63,33 @@ const PostPage = () => {
 
         setIsLoading(true);
 
-        // 1. Storageに画像をアップロードする
-        let publicUrl = '';
-        const fileExtension = selectedFile.name.split('.').pop();
-        // ユーザーIDとタイムスタンプを使ってユニークなファイル名を生成
-        const filePath = `${userId}/${Date.now()}.${fileExtension}`; 
+        // FormDataオブジェクトを作成し、FastAPIに送信するデータを準備
+        const formData = new FormData();
+        // ⚠️ FastAPI側が期待するフィールド名: 'image'
+        formData.append('image', selectedFile, selectedFile.name);
+        // ⚠️ FastAPI側が期待するフィールド名: 'user_id'
+        // FastAPI側ではAuthの検証は行わず、フロントエンドからの user_id を信用している点に注意
+        formData.append('user_id', userId); 
+        // キャプションは現状FastAPI側では使用されないため送らなくても良いが、拡張性を考慮し残しても良い
 
         try {
-            const { data: uploadData, error: uploadError } = await supabase.storage
-                // ⚠️ バケット名を 'post_photos' に変更してください
-                .from('post_photos') 
-                .upload(filePath, selectedFile, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
+            // FastAPIのエンドポイントにデータを送信
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                // Content-Type: 'multipart/form-data' は FormData使用時は自動で設定されるため不要
+                body: formData,
+            });
 
-            if (uploadError) {
-                throw uploadError;
+            const result = await response.json();
+
+            if (!response.ok) {
+                // FastAPIからエラーが返された場合
+                throw new Error(result.detail || 'バックエンド処理中にエラーが発生しました');
             }
 
-            // ⚠️ Storageの公開設定に基づいて、公開URLを取得します
-            const { data: { publicUrl: url } } = supabase.storage
-                .from('post_photos') 
-                .getPublicUrl(filePath);
-            
-            publicUrl = url;
-
-        // 2. Databaseに投稿レコードを挿入する
-            const { data: postData, error: insertError } = await supabase
-                // ⚠️ テーブル名を 'posts' に変更してください
-                .from('posts') 
-                .insert([
-                    { 
-                        user_id: userId,
-                        photo_url: publicUrl,
-                        caption: caption,
-                        // 他のフィールド（例: emotion, pointsなど）があればここに追加
-                    },
-                ]);
-
-            if (insertError) {
-                throw insertError;
-            }
-
-
-            // 成功メッセージ（感情分析などはダミーのままにしてあります）
-            const mockResponse = { emotion: '和む', points: 50 };
-            alert(`🎉 投稿が完了！感情: ${mockResponse.emotion}が記録されました！+${mockResponse.points}Pゲット！`);
+            // 成功メッセージ（Geminiによって生成されたコメントをアラート表示）
+            alert(`🎉 投稿が完了！\nAIコメント: 「${result.comment}」が記録されました！`);
+            // ここでホーム画面などへリダイレクトしても良い (router.push('/home'))
 
             // リセット
             setSelectedFile(null);
