@@ -13,14 +13,18 @@ body {
 
 /* フォームの入れ物（カード） */
 .post-container {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 500px; /* モバイル画面サイズを想定 */
-    margin: 20px auto;
-    text-align: center;
+    /* ビューポート全体を使う（親の html/body は globals.css で高さ100%に設定済み） */
+    min-height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: auto; /* 内容が多ければスクロール */
+    background: var(--background);
+    z-index: 20;
 }
 
 h2 {
@@ -43,8 +47,8 @@ h2 {
 
 /* プレビュー画像 */
 .preview-image {
-    max-width: 100%;
-    max-height: 300px;
+    max-width: 90%;
+    max-height: 60vh;
     object-fit: contain;
     border-radius: 8px;
     margin-bottom: 20px;
@@ -98,4 +102,11 @@ textarea {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+}
+
+/* プレビュー画像の最大サイズ調整 */
+.photo-area .preview-image {
+    max-width: 90%;
+    max-height: 60vh;
+    object-fit: contain;
 }
