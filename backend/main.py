@@ -5,6 +5,47 @@ from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client as SupabaseClient
 from google import genai
 from pydantic import BaseModel
+from datetime import datetime, timedelta
+from typing import Optional
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+import logging
+
+# --- JWT 設定 ---
+SECRET_KEY = os.environ.get("JWT_SECRET", "dev-secret")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7日
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
+# Check for insecure default secret key
+ENV = os.environ.get("ENV", os.environ.get("PYTHON_ENV", "production")).lower()
+if SECRET_KEY == "dev-secret":
+    if ENV == "production":
+        raise RuntimeError("JWT_SECRET environment variable must be set in production. Using default 'dev-secret' is insecure.")
+    else:
+        logging.warning("Using default JWT secret key 'dev-secret'. This is insecure and should only be used for development.")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
 
 # --- 1. 環境設定と初期化 ---
 # .envファイルなどで管理することを推奨
@@ -32,7 +73,7 @@ app.add_middleware(
 )
 
 # GeminiとSupabaseクライアントの初期化
-genai.configure(api_key=GEMINI_API_KEY)
+gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 
 # Supabaseクライアントを依存性注入で使用
 def get_supabase_client() -> SupabaseClient:
@@ -48,6 +89,21 @@ class DiaryResponse(BaseModel):
     comment: str
     image_url: str
     diary_id: int
+
+
+# --- 認証用モデル ---
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
+
+class LoginForm(BaseModel):
+    email: str
+    password: str
 
 # --- 3. APIエンドポイントの定義 ---
 
@@ -124,3 +180,36 @@ async def analyze_and_save_diary(
         image_url=image_url,
         diary_id=new_diary_id
     )
+
+
+@app.post('/api/login', response_model=Token)
+async def login(form: LoginForm):
+    """
+    シンプルなログインエンドポイント。
+    - このサンプルではユーザー情報はハードコード/環境変数で管理します。
+    - 本番ではDBでユーザーを管理してください。
+    """
+    # テスト用ハードコードユーザ: 環境変数で上書き可能
+    demo_email = os.environ.get('DEMO_USER_EMAIL', 'user@example.com')
+    demo_password_hash = os.environ.get('DEMO_USER_PASSWORD_HASH')
+    demo_password_plain = os.environ.get('DEMO_USER_PASSWORD')
+
+    # パスワードハッシュが未指定で平文があればハッシュ化して使う
+    if not demo_password_hash and demo_password_plain:
+        demo_password_hash = get_password_hash(demo_password_plain)
+
+    # ここでは email と password を比較
+    # Always verify password, even if email is invalid, to avoid timing attacks
+    # Use a dummy hash if email does not match or password hash is missing
+    DUMMY_HASH = "$2b$12$C6UzMDM.H6dfI/f/IKcEeOe5F2bY6b2b1Z6b2b1Z6b2b1Z6b2b1Z6b2"  # bcrypt hash for "dummy"
+    password_hash_to_check = demo_password_hash if form.email == demo_email and demo_password_hash else DUMMY_HASH
+    if not verify_password(form.password, password_hash_to_check):
+        raise HTTPException(status_code=401, detail='認証に失敗しました')
+    if form.email != demo_email or not demo_password_hash:
+        raise HTTPException(status_code=401, detail='認証に失敗しました')
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": form.email}, expires_delta=access_token_expires
+    )
+
+    return {"access_token": access_token, "token_type": "bearer"}
