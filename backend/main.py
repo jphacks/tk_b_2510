@@ -9,12 +9,23 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+import logging
 
 # --- JWT 設定 ---
 SECRET_KEY = os.environ.get("JWT_SECRET", "dev-secret")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7日
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
+# Check for insecure default secret key
+ENV = os.environ.get("ENV", os.environ.get("PYTHON_ENV", "production")).lower()
+if SECRET_KEY == "dev-secret":
+    if ENV == "production":
+        raise RuntimeError("JWT_SECRET environment variable must be set in production. Using default 'dev-secret' is insecure.")
+    else:
+        logging.warning("Using default JWT secret key 'dev-secret'. This is insecure and should only be used for development.")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
