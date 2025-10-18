@@ -1,5 +1,5 @@
 fastapi
 uvicorn[standard]
-supabase-py
+supabase
 google-genai
 python-dotenv
