@@ -62,7 +62,15 @@ export default function LoginPage() {
 
         {error && <div role="alert" className={styles.error}>{error}</div>}
 
-        <button className={styles.button} type="submit" disabled={loading}>{loading ? "送信中..." : "ログイン"}</button>
+        <button
+          className={styles.button}
+          type="submit"
+          disabled={loading}
+          aria-disabled={loading}
+          aria-busy={loading}
+        >
+          {loading ? "送信中..." : "ログイン"}
+        </button>
 
         <div className={styles.footer}>
           <button type="button" className={styles.link} onClick={() => alert('仮のパスワード再発行リンク')}>パスワードを忘れた場合</button>
