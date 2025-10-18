@@ -1,6 +1,7 @@
 'use client'; 
 
 import React from 'react';
+import AuthGuard from '../../lib/AuthGuard';
 
 // スタイルオブジェクトの定義
 const styles = {
@@ -455,4 +456,10 @@ const MyProfile = () => {
   );
 };
 
-export default MyProfile;
+export default function SettingsWrapper() {
+  return (
+    <AuthGuard>
+      <MyProfile />
+    </AuthGuard>
+  );
+}

@@ -64,8 +64,8 @@ export default function LoginPage() {
         // 保存: access token は session オブジェクトから取得
         if (data && data.session && data.session.access_token) {
           localStorage.setItem('access_token', data.session.access_token);
-          // リダイレクト先を/homepageに変更
-          router.push('/homepage');
+          // リダイレクト先を/homeに変更
+          router.push('/home');
         } else {
           throw new Error('ログインに失敗しました');
         }
