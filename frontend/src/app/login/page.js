@@ -28,11 +28,35 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
+    try {
+      const res = await fetch("http://localhost:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    console.log("ログイン試行:", { email });
-    alert("モックログイン成功: " + email);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || "ログインに失敗しました");
+      }
+
+      const data = await res.json();
+      // 受け取ったトークンを localStorage に保存
+      if (data.access_token) {
+        localStorage.setItem("access_token", data.access_token);
+        // 簡易的にホームへリダイレクト
+        window.location.href = "/";
+      } else {
+        throw new Error("トークンが返却されませんでした");
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "ログイン中にエラーが発生しました");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
