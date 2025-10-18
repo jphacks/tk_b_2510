@@ -16,6 +16,9 @@ export default function DiaryPage() {
     const [photos, setPhotos] = useState([]);
     const [selected, setSelected] = useState(null);
     const [error, setError] = useState(null); // 追加
+    const [dayComments, setDayComments] = useState([]);
+    const [aiComment, setAiComment] = useState(null);
+    const [aiLoading, setAiLoading] = useState(false);
 
     // --- timelapse state ---
     const [generating, setGenerating] = useState(false);
@@ -199,6 +202,53 @@ export default function DiaryPage() {
         return map;
     }, [photos]);
 
+    // selected が変わったら、その日のユーザーコメント一覧を取得し、AI要約を取得（/api/ai-summary があれば利用、なければ簡易要約）
+    useEffect(() => {
+        if (!selected) {
+            setDayComments([]);
+            setAiComment(null);
+            setAiLoading(false);
+            return;
+        }
+        const ymd = selected.date;
+        const comments = (grouped[ymd] || []).map(p => p.caption).filter(Boolean);
+        setDayComments(comments);
+
+        (async () => {
+            setAiLoading(true);
+            // サーバー側でAI要約を行うエンドポイントがあれば呼ぶ（任意）。無ければローカルで簡易要約。
+            try {
+                const res = await fetch('/api/ai-summary', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date: ymd, comments })
+                });
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json && json.summary) {
+                        setAiComment(json.summary);
+                        setAiLoading(false);
+                        return;
+                    }
+                }
+            } catch (e) {
+                // 無視してローカル要約へフォールバック
+            }
+
+            // フォールバックの簡易要約
+            let summary;
+            if (comments.length === 0) summary = 'この日はコメントがありません。';
+            else if (comments.length === 1) summary = `一言でまとめると：${comments[0]}`;
+            else {
+                const sample = comments.slice(0, 2).join(' / ');
+                const rest = Math.max(0, comments.length - 2);
+                summary = rest > 0 ? `${sample} …他 ${rest} 件の思い出` : sample;
+            }
+            setAiComment(summary);
+            setAiLoading(false);
+        })();
+    }, [selected, grouped]);
+
     const weeks = useMemo(() => {
         const first = new Date(year, month, 1);
         const startWeekday = first.getDay();
@@ -276,6 +326,93 @@ export default function DiaryPage() {
                     0% { transform: translateY(0); }
                     50% { transform: translateY(-4px); }
                     100% { transform: translateY(0); }
+                }
+
+                /* カレンダー全体を丸く・余白を与える */
+                .calendar {
+                    border-collapse: separate;
+                    border-spacing: 10px;
+                    width: 100%;
+                }
+                .calendar th {
+                    padding: 8px 6px;
+                    font-weight: 600;
+                    color: #555;
+                }
+
+                /* 日セルを丸く、余白と背景を追加 */
+                .day-cell {
+                    position: relative;
+                    overflow: visible;
+                    background: rgba(255,255,255,0.92);
+                    border-radius: 14px;
+                    padding: 10px;
+                    transition: box-shadow 180ms ease, transform 180ms ease, background 160ms ease;
+                    min-width: 86px;
+                    height: 86px;
+                    vertical-align: top;
+                }
+                /* ホバーで浮き上がる感じ */
+                .day-cell:hover {
+                    box-shadow: 0 14px 36px rgba(12,12,20,0.08);
+                    transform: translateY(-4px);
+                    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,248,250,0.98));
+                }
+
+                .empty {
+                    background: transparent;
+                }
+
+                .day-number {
+                    display: inline-block;
+                    padding: 6px 8px;
+                    border-radius: 10px;
+                    font-size: 13px;
+                    color: #333;
+                    background: rgba(0,0,0,0.04);
+                    margin-bottom: 6px;
+                }
+
+                .thumbs {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    margin-top: 6px;
+                }
+
+                .thumb {
+                    width: 48px;
+                    height: 48px;
+                    object-fit: cover;
+                    border-radius: 10px;
+                    transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms ease;
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+                .thumb + .thumb {
+                    margin-left: 6px;
+                }
+
+                /* 日セルにカーソルが乗ったらそのセル内のサムネイルを少し拡大 */
+                .day-cell:hover .thumb {
+                    transform: scale(1.12);
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.16);
+                    z-index: 2;
+                    position: relative;
+                }
+
+                /* 個別のサムネイルに直接ホバーしたときはさらに拡大 */
+                .thumb:hover {
+                    transform: scale(1.26);
+                    box-shadow: 0 18px 30px rgba(0,0,0,0.22);
+                    z-index: 3;
+                }
+
+                /* カレンダーの角をより丸く見せるためにテーブル自体にも軽い角を付与 */
+                .calendar-wrapper {
+                    border-radius: 16px;
+                    padding: 8px;
+                    background: transparent;
                 }
             `}</style>
 
@@ -365,8 +502,29 @@ export default function DiaryPage() {
                 <div className="modal" onClick={() => setSelected(null)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <button className="close" onClick={() => setSelected(null)}>✕</button>
-                        <img src={selected.url} alt={selected.caption} />
-                        <p className="caption">{selected.caption}</p>
+                        {/* 画像はクリックで新しいタブで開く */}
+                        <img
+                            src={selected.url}
+                            alt={selected.caption}
+                            style={{ maxWidth: '100%', cursor: 'zoom-in' }}
+                            onClick={() => window.open(selected.url, '_blank')}
+                        />
+                        <div style={{ marginTop: 12 }}>
+                            <strong>ユーザーコメント</strong>
+                            {dayComments.length === 0 ? (
+                                <div style={{ color: '#666' }}>コメントはありません</div>
+                            ) : (
+                                <ul style={{ marginTop: 6 }}>
+                                    {dayComments.map((c, i) => <li key={i}>{c}</li>)}
+                                </ul>
+                            )}
+                        </div>
+                        <div style={{ marginTop: 10 }}>
+                            <strong>AIのコメント</strong>
+                            <div style={{ color: '#333', marginTop: 6 }}>
+                                {aiLoading ? '要約を生成中...' : (aiComment || '—')}
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
