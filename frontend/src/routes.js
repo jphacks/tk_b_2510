@@ -15,4 +15,12 @@ export const appRoutes = [
     path: '/settings',
     name: '設定',
   },
+  {
+    path: '/diary',
+    name: '日記',
+  },
+  {
+    path: '/homepage',
+    name: 'ホームページ',
+  },
 ];
