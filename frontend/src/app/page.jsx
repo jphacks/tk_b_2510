@@ -4,9 +4,6 @@ import './globals.css'; // スタイルを別ファイルから読み込みま�
 function App() {
   return (
     <div className="container">
-      <header className="app-header">
-        <h1 className="title cute-title">Emolog</h1>
-      </header>
       
       {/* メインコンテンツとナビゲーションを左右に並べるためのラッパー */}
       <div className="content-wrapper">
@@ -16,7 +13,7 @@ function App() {
           <p className="tagline-large">
             〜あなたの感情が
           </p>
-          <p className="tagline-large">
+          <p className="tagline-large tagline-offset">
             世界を緑に変えていく〜
           </p>
           <p className="description">
@@ -31,6 +28,8 @@ function App() {
         </nav>
 
       </div>
+
+    
     </div>
   );
 }
