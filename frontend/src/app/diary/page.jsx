@@ -211,7 +211,8 @@ function DiaryPage() {
     const grouped = useMemo(() => {
         const map = {};
         photos.forEach(p => {
-            map[p.date] = map[p.date] || [];
+            // APIレスポンスの p.date はフルタイムスタンプなので、グルーピングキーには不適
+            map[p.date] = map[p.date] || []; 
             map[p.date].push(p);
         });
         return map;
