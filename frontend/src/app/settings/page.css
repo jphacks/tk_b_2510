@@ -1,63 +1,46 @@
 /* page.css */
 
-/* 変数定義（オプション） */
-:root {
-    --primary-color: #0095f6;
-    --secondary-color: #efefef;
-    --border-color: #dbdbdb;
-    --background-color: #ffffff;
-    --text-color: #262626;
-    --accent-color: #80deea; /* 外枠の色 */
-    --camera-color: #00bcd4;
-    --danger-color: red;
-}
-
-/* bodyBase */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+/* settings page base (scoped) */
+.settings-page {
+    font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
     margin: 0;
-    padding: 0;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 24px 16px;
+    box-sizing: border-box;
+    background-color: var(--background-color, var(--background, #ffffff));
+    color: var(--text-color, var(--foreground, #262626));
 }
 
-/* contentContainer */
-.content-container {
+.settings-container {
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
     padding: 20px;
     position: relative;
-    flex-shrink: 0;
-    border: 6px solid var(--accent-color);
+    border: 6px solid var(--accent-color, #80deea);
     border-radius: 12px;
-    background-color: var(--background-color);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: var(--background-color, var(--background, #ffffff));
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* settingsIcon */
-.settings-icon {
+.settings-container .settings-icon {
     position: absolute;
     top: 20px;
     right: 20px;
     font-size: 24px;
-    color: var(--text-color);
+    color: var(--text-color, var(--foreground, #262626));
     text-decoration: none;
     cursor: pointer;
     z-index: 10;
 }
 
-.settings-icon:hover,
-.settings-icon-hover {
+.settings-container .settings-icon:hover,
+.settings-container .settings-icon-hover {
     color: #8e8e8e;
 }
 
 /* profileHeader */
-.profile-header {
+.settings-container .profile-header {
     display: flex;
     align-items: center;
     margin-bottom: 44px;
@@ -65,7 +48,7 @@ body {
 }
 
 /* profilePhotoArea */
-.profile-photo-area {
+.settings-container .profile-photo-area {
     flex: 1;
     display: flex;
     justify-content: center;
@@ -74,7 +57,7 @@ body {
 }
 
 /* profilePhoto */
-.profile-photo {
+.settings-container .profile-photo {
     width: 150px;
     height: 150px;
     border-radius: 50%;
@@ -85,25 +68,25 @@ body {
 }
 
 /* cameraIcon */
-.camera-icon {
+.settings-container .camera-icon {
     position: absolute;
     /* translate(-50%, -50%)に対応するため、topとleftを調整 */
     top: 43%; 
     left: 47%;
     transform: translate(-50%, -50%);
     font-size: 60px;
-    color: var(--camera-color);
+    color: var(--camera-color, #00bcd4);
     z-index: 2;
     pointer-events: none;
 }
 
 /* profileInfoArea */
-.profile-info-area {
+.settings-container .profile-info-area {
     flex: 2;
 }
 
 /* userActions */
-.user-actions {
+.settings-container .user-actions {
     display: flex;
     align-items: center;
     margin-bottom: 20px;
@@ -111,7 +94,7 @@ body {
 }
 
 /* username */
-.username {
+.settings-container .username {
     font-size: 28px;
     font-weight: 300;
     margin-right: 20px;
@@ -121,10 +104,10 @@ body {
 }
 
 /* editButton */
-.edit-button {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
+.settings-container .edit-button {
+    background-color: var(--secondary-color, #efefef);
+    color: var(--text-color, var(--foreground, #262626));
+    border: 1px solid var(--border-color, #dbdbdb);
     border-radius: 4px;
     padding: 5px 12px;
     font-weight: bold;
@@ -135,43 +118,42 @@ body {
 }
 
 /* bioText */
-.bio-text {
+.settings-container .bio-text {
     font-size: 16px;
     margin-top: 0;
     margin-bottom: 0;
 }
 
 /* editForm */
-.edit-form {
+.settings-container .edit-form {
     padding: 20px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #dbdbdb);
     border-radius: 8px;
-    background-color: var(--background-color);
+    background-color: var(--background-color, var(--background, #ffffff));
     margin-top: 20px;
 }
 
 /* formGroup */
-.form-group {
+.settings-container .form-group {
     margin-bottom: 15px;
 }
 
-/* input, textarea */
-.form-input {
+.settings-container .form-input {
     width: 100%;
     padding: 8px;
     border-radius: 4px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #dbdbdb);
     box-sizing: border-box;
     margin-top: 5px;
 }
 
-.form-textarea {
+.settings-container .form-textarea {
     resize: vertical;
 }
 
 /* saveButton */
-.save-button {
-    background-color: var(--primary-color);
+.settings-container .save-button {
+    background-color: var(--primary-color, #0095f6);
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -182,10 +164,10 @@ body {
 }
 
 /* photoEditButton */
-.photo-edit-button {
-    background-color: var(--background-color);
-    color: var(--primary-color);
-    border: 1px solid var(--primary-color);
+.settings-container .photo-edit-button {
+    background-color: var(--background-color, var(--background, #ffffff));
+    color: var(--primary-color, #0095f6);
+    border: 1px solid var(--primary-color, #0095f6);
     border-radius: 4px;
     padding: 8px 16px;
     font-weight: bold;
@@ -196,40 +178,40 @@ body {
 }
 
 /* settingsTitle */
-.settings-title {
+.settings-container .settings-title {
     font-size: 26px;
     font-weight: 300;
     margin-bottom: 30px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color, #dbdbdb);
     padding-bottom: 10px;
 }
 
 /* settingsItem */
-.settings-item {
+.settings-container .settings-item {
     padding: 15px 0;
     border-bottom: 1px solid #efefef;
 }
 
-.settings-item h3 {
+.settings-container .settings-item h3 {
     font-size: 18px;
     margin-bottom: 5px;
     margin-top: 0;
 }
 
-.settings-item p {
+.settings-container .settings-item p {
     font-size: 14px;
     color: #8e8e8e;
     margin-bottom: 10px;
     margin-top: 0;
 }
 
-.settings-item:last-child {
+.settings-container .settings-item:last-child {
     border-bottom: none !important;
 }
 
 /* settingsButton */
-.settings-button {
-    background-color: var(--primary-color);
+.settings-container .settings-button {
+    background-color: var(--primary-color, #0095f6);
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -241,10 +223,10 @@ body {
 }
 
 /* settingsDangerButton */
-.settings-danger-button {
+.settings-container .settings-danger-button {
     background-color: transparent;
-    color: var(--danger-color);
-    border: 1px solid var(--danger-color);
+    color: var(--danger-color, red);
+    border: 1px solid var(--danger-color, red);
     border-radius: 4px;
     padding: 8px 16px;
     font-weight: bold;
@@ -254,17 +236,17 @@ body {
 }
 
 /* settingsCheckboxLabel */
-.settings-checkbox-label {
+.settings-container .settings-checkbox-label {
     display: block;
     margin-top: 10px;
     font-size: 14px;
 }
 
 /* passwordChangeForm */
-.password-change-form {
+.settings-container .password-change-form {
     margin-top: 15px;
     padding: 15px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #dbdbdb);
     border-radius: 4px;
     background-color: #f9f9f9;
 }
