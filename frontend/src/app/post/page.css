@@ -1,40 +1,41 @@
-/* PostPage.css */
+/* PostPage.css (refactored)
+   - Avoid styling the global `body` so header/footer from `globals.css` are not hidden.
+   - Scope all rules under the .post-page / .post-container namespace. */
 
-/* ページ全体 */
-body {
+/* ルートコンテナ: ページ固有のスコープ */
+.post-page {
     font-family: sans-serif;
-    background-color: #f0f0f5; /* 淡いグレーの背景色 */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* 中央寄せ */
-    align-items: center;
-    min-height: 100vh;
+    /* Use global variable from globals.css */
+    background-color: var(--background-color, #f0f0f5);
     margin: 0;
+    padding: 32px 16px; /* allow space so header/footer remain visible */
+    box-sizing: border-box;
 }
 
 /* フォームの入れ物（カード） */
 .post-container {
-    /* ビューポート全体を使う（親の html/body は globals.css で高さ100%に設定済み） */
-    min-height: 100vh;
     width: 100%;
+    max-width: 900px;
     box-sizing: border-box;
     padding: 24px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: auto; /* 内容が多ければスクロール */
-    background: var(--background);
-    z-index: 20;
+    align-items: stretch;
+    justify-content: flex-start;
+    margin: 0 auto; /* center in page but keep header/footer visible */
+    overflow: visible; /* let header/footer sit above/below naturally */
+    background: var(--background-color, #ffffff);
+    border-radius: 8px;
 }
 
-h2 {
+/* Scoped headings */
+.post-container h2 {
     color: #4a5568;
     margin-bottom: 25px;
 }
 
 /* 写真選択ボタン */
-.upload-label {
+.post-container .upload-label {
     display: block;
     padding: 20px;
     background-color: #5A67D8; /* 青色のメインカラー */
@@ -47,8 +48,8 @@ h2 {
 }
 
 /* プレビュー画像 */
-.preview-image {
-    max-width: 90%;
+.post-container .preview-image {
+    max-width: 100%;
     max-height: 60vh;
     object-fit: contain;
     border-radius: 8px;
@@ -57,12 +58,12 @@ h2 {
 }
 
 /* コメント入力欄 */
-.caption-area {
+.post-container .caption-area {
     text-align: left;
     margin-bottom: 20px;
 }
 
-textarea {
+.post-container textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
@@ -72,8 +73,7 @@ textarea {
     box-sizing: border-box;
 }
 
-/* 投稿ボタン */
-#submit-button {
+.post-container #submit-button {
     width: 100%;
     padding: 15px;
     background-color: #38A169; /* 緑色のボタン */
@@ -84,8 +84,7 @@ textarea {
     cursor: pointer;
 }
 
-/* ボタンが押せないとき（無効）の見た目 */
-#submit-button:disabled {
+.post-container #submit-button:disabled {
     background-color: #BEE3F8;
     cursor: not-allowed;
 }
@@ -102,12 +101,12 @@ textarea {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 4000; /* intentionally high so it overlays other content when active */
 }
 
 /* プレビュー画像の最大サイズ調整 */
-.photo-area .preview-image {
-    max-width: 90%;
+.post-container .photo-area .preview-image {
+    max-width: 100%;
     max-height: 60vh;
     object-fit: contain;
 }
