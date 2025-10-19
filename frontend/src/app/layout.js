@@ -3,6 +3,7 @@ import "./globals.css";
 // ------------------------------------------------------------------
 // 📁 components/Footer.js から Footer コンポーネントをインポートします
 import Footer from '../components/Footer'; 
+import Header from '../components/Header';
 // ------------------------------------------------------------------
 
 const geistSans = Geist({
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Header />
         {children} {/* 各ページのコンテンツがここに表示されます */}
         {/* ------------------------------------------------------ */}
         <Footer /> {/* 全てのページに共通のフッターを追加します */}

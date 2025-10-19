@@ -2,7 +2,7 @@
 
 'use client'; 
 
-import React from 'react';
+import React, { useEffect } from 'react'; // 💡 useEffectをインポートに追加
 import './page.css'; // CSSファイルをインポート
 import AuthGuard from '../../lib/AuthGuard';
 import { supabase } from '../../lib/supabaseClient'; // 💡 追加: Supabaseクライアントをインポート
@@ -52,6 +52,11 @@ const SettingsPage = ({ onGoBack }) => {
     const handlePasswordUpdate = () => {
         if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmNewPassword) {
             alert('全てのフィールドを入力してください。');
+            return;
+        }
+
+        if (passwordData.newPassword.length < 6) {
+            alert('新しいパスワードは6文字以上で入力してください。');
             return;
         }
 
@@ -135,7 +140,7 @@ const SettingsPage = ({ onGoBack }) => {
                             </div>
                             
                             <div className="form-group">
-                                <label>新しいパスワード:</label>
+                                <label>新しいパスワード (6文字以上):</label>
                                 <input
                                     type="password"
                                     name="newPassword"
@@ -207,14 +212,66 @@ const SettingsPage = ({ onGoBack }) => {
 // メインコンポーネント
 const MyProfile = () => {
     const [profile, setProfile] = React.useState({
-        username: 'user_name',
+        // 💡 ユーザー情報が読み込まれるまでのプレースホルダー
+        username: '読み込み中...', 
         bio: '写真を撮るのが好きです。旅行とグルメが趣味です。🌍🍜',
         photoUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
     });
     const [isEditing, setIsEditing] = React.useState(false);
     const [view, setView] = React.useState('profile');
     const fileInputRef = React.useRef(null);
+    
+    // 💡 useEffectを追加してユーザー情報を取得
+    React.useEffect(() => {
+        let mounted = true;
+        const fetchUser = async () => {
+            try {
+                // 1. Supabaseから現在のユーザーを取得
+                const { data: { user }, error } = await supabase.auth.getUser(); //
 
+                if (error) {
+                    console.error("ユーザー情報の取得エラー:", error.message);
+                }
+
+                if (user && mounted) {
+                    // 2. メールアドレスを取得し、@より前の部分を抽出
+                    const email = user.email; //
+                    let newUsername;
+                    if (email) {
+                        newUsername = email.split('@')[0];
+                    } else {
+                        // メールアドレスがない場合はフォールバック
+                        newUsername = user.user_metadata?.full_name || 'ユーザー名未設定';
+                    }
+                    
+                    // ユーザー名と写真の更新（写真のURLは今回は固定のまま）
+                    setProfile(prev => ({ 
+                        ...prev, 
+                        username: newUsername,
+                    }));
+                } else if (mounted) {
+                    // ログインしていない場合（AuthGuardが処理するが、念のため）
+                     setProfile(prev => ({ 
+                        ...prev, 
+                        username: 'ゲスト',
+                    }));
+                }
+            } catch (err) {
+                console.error("ユーザー情報取得中に予期せぬエラー:", err);
+                 if (mounted) {
+                     setProfile(prev => ({ 
+                        ...prev, 
+                        username: 'エラー',
+                    }));
+                 }
+            }
+        };
+
+        fetchUser();
+
+        return () => { mounted = false; };
+    }, []); // 初回マウント時のみ実行
+    
     // bodyBaseスタイルはCSSのbodyタグに適用されているため、このdivは不要、
     // あるいはCSSで定義された中央揃えのためのトップレベルdivとして機能します。
     // スタイルオブジェクトから取り出した`bodyBase`は不要ですが、中央揃えのために残します。

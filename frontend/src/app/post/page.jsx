@@ -1,3 +1,5 @@
+// frontend/src/app/post/page.jsx
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
@@ -6,6 +8,49 @@ import AuthGuard from '../../lib/AuthGuard';
 
 const API_ENDPOINT = 'http://localhost:8000/analyze-and-save'; 
 
+// 💡 追加: 分析結果を表示するためのモーダルコンポーネント
+const ResultModal = ({ data, onClose }) => {
+    const { emotion, comment } = data;
+
+    // 感情によってクラスを分ける (CSSで色とアニメーションを制御)
+    const emotionClass = (e) => {
+        if (e.includes('楽し') || e.includes('喜')) return 'emotion-happy';
+        if (e.includes('悲し')) return 'emotion-sad';
+        if (e.includes('怒り') || e.includes('不満')) return 'emotion-anger';
+        if (e.includes('穏や') || e.includes('落ち着')) return 'emotion-calm';
+        return 'emotion-default';
+    };
+
+    return (
+        <div className="result-modal-overlay" onClick={onClose}>
+            <div className={`result-modal-card ${emotionClass(emotion)}`} onClick={(e) => e.stopPropagation()}>
+                <button className="close-button" onClick={onClose}>✕</button>
+                <div className="result-icon">
+                    {/* 感情に対応するエモいアイコン */}
+                    {emotion.includes('楽し') || emotion.includes('喜') ? '🎉' :
+                     emotion.includes('悲し') ? '😢' :
+                     emotion.includes('怒り') || emotion.includes('不満') ? '😡' :
+                     emotion.includes('穏や') || emotion.includes('落ち着') ? '😌' :
+                     '✨'}
+                </div>
+                <h3 className="result-title">感情を記録しました！</h3>
+                <p className="result-emotion">あなたの気持ち: <span>{emotion}</span></p>
+                
+                <div className="ai-comment-box">
+                    <p className="ai-comment-label">AIのコメント:</p>
+                    <p className="ai-comment-text">『{comment}』</p>
+                </div>
+
+                <div className="result-footer">
+                    <button className="ok-button" onClick={onClose}>閉じる</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+// 💡 ResultModalコンポーネントの定義終わり
+
+
 const PostPage = () => {
     // ページの状態（選んだ写真、コメントなど）を覚えるための箱を用意
     const [selectedFile, setSelectedFile] = useState(null);
@@ -13,6 +58,8 @@ const PostPage = () => {
     const [caption, setCaption] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [userId, setUserId] = useState(null); // ユーザーIDを保持する状態
+    // 💡 修正箇所: この行が未定義エラーの原因です。必ずPostPageコンポーネントの直下に追加してください。
+    const [resultData, setResultData] = useState(null); // { emotion, comment, image_url } を保持
 
     // 💡 コンポーネントロード時にログインユーザーのIDを取得
     useEffect(() => {
@@ -87,9 +134,8 @@ const PostPage = () => {
                 throw new Error(result.detail || 'バックエンド処理中にエラーが発生しました');
             }
 
-            // 成功メッセージ（Geminiによって生成されたコメントをアラート表示）
-            alert(`🎉 投稿が完了！\nAIコメント: 「${result.comment}」が記録されました！`);
-            // ここでホーム画面などへリダイレクトしても良い (router.push('/home'))
+            // 💡 変更: alert() を削除し、結果をステートに保存してモーダルを表示
+            setResultData(result); 
 
             // リセット
             setSelectedFile(null);
@@ -104,7 +150,7 @@ const PostPage = () => {
         }
     };
 
-    // --- 省略（JSXの部分は変更なし） ---
+    // --- JSXの部分 ---
     return (
         <div className="post-container">
             <h2>今日の感情を記録する</h2>
@@ -151,6 +197,11 @@ const PostPage = () => {
                 <div className="loading-overlay">
                     <p>感情を読み取っています...</p>
                 </div>
+            )}
+
+            {/* 💡 結果モーダルを追加 */}
+            {resultData && (
+                <ResultModal data={resultData} onClose={() => setResultData(null)} />
             )}
         </div>
     );
