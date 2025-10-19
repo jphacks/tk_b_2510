@@ -1,5 +1,5 @@
 import React from 'react';
-import './globals.css'; // スタイルを別ファイルから読み込みます
+import './page.css'; // スタイルを別ファイルから読み込みます
 
 function App() {
   return (
@@ -10,8 +10,9 @@ function App() {
       </header>
       */}
       
-      {/* メインコンテンツとナビゲーションを左右に並べるためのラッパー */}
-      <div className="content-wrapper">
+      {/* ヘッダーとフッターの間だけ背景を表示するラッパー */}
+      <div className="page-body-bg">    {/* ヘッダーとフッターの間だけ背景を表示するラッパー */}
+        <div className="content-wrapper">
         
         {/* 左側のメインコンテンツ */}
         <main className="main-content">
@@ -19,19 +20,22 @@ function App() {
             〜あなたの感情が
           </p>
           <p className="tagline-large tagline-offset">
-            世界を緑に変えていく〜
+            世界を笑顔に変えていく〜
           </p>
           <p className="description">
-            Emologは、AIによる感情分析とアバター育成要素を組み合わせた、まったく新しいセルフケア・ジャーナリングアプリです。日々の感情を記録するだけでなく、その感情と継続が「あなただけの世界」を育てる体験を提供します。
+            Emologは、AIによる感情分析とリキャップによるセルフケア・ジャーナリングアプリです。
+            日々の感情を記録するだけでなく、AIが写真に対してコメントを返し
+            それらがリキャップとして映像になることで、
+            至高のエモいを体感します。
           </p>
         </main>
 
         {/* 右側のナビゲーション */}
         <nav className="navigation">
-          <a href="/login" className="nav-link login-button">Login</a>
-          <a href="/register" className="nav-link register-link">新規登録はこちらから</a>
+          <a href="/login" className="nav-link login-button">Logon/Login</a>
         </nav>
 
+      </div>
       </div>
 
     
