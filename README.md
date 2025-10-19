@@ -50,3 +50,6 @@ Emologは、**AIによる感情分析**と**AIによるコメント感情分析*
     * **AI感情分析フロー:** `backend/main.py`
     * **連続日数計算ロジック:** `frontend/src/app/user-home/page.js`
     * **タイムラプス生成ロジック:** `frontend/src/app/diary/page.jsx`
+
+## デプロイURL
+https://emolog-psi.vercel.app/
