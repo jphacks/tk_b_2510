@@ -18,7 +18,7 @@ function App() {
           <p className="tagline-large">
             〜あなたの感情が
           </p>
-          <p className="tagline-large">
+          <p className="tagline-large tagline-offset">
             世界を緑に変えていく〜
           </p>
           <p className="description">
@@ -33,6 +33,8 @@ function App() {
         </nav>
 
       </div>
+
+    
     </div>
   );
 }
