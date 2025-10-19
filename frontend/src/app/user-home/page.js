@@ -45,16 +45,18 @@ export function HomePage() {
           return;
         }
 
-        // 表示名をユーザーメタデータの full_name / user_metadata.name / email の順で取得
-        const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'あなた';
+        // [修正] ユーザー名をメールアドレスの @ より前の部分にする
+        const email = user.email || 'あなた';
+        const name = email.split('@')[0];
+        
         if (mounted) setUsername(name);
 
         // photos テーブルからこのユーザーの投稿データ（日付のみ）を取得
         const { data: photos, error: photosError } = await supabase
-          .from('photos')
-          .select('date') // 連続日数計算には日付のみでOK
+          .from('posts') // テーブル名を 'posts' に修正
+          .select('created_at') // DBのフィールド名に合わせて 'created_at' に修正
           .eq('user_id', user.id)
-          .order('date', { ascending: false });
+          .order('created_at', { ascending: false }); // フィールド名に合わせて修正
 
         if (photosError) {
           console.warn('supabase photos fetch error', photosError.message || photosError);
@@ -65,6 +67,9 @@ export function HomePage() {
           }
           return;
         }
+        
+        // データをローカルの日付形式に統一してからロジックを実行
+        const dateKey = 'created_at';
 
         if (mounted) {
           // 投稿数の計算
@@ -75,7 +80,7 @@ export function HomePage() {
           // 1. 投稿日をローカルタイムゾーンのYYYY-MM-DD形式に正規化し、重複を排除
           const uniqueLocalDates = new Set(
             (photos || [])
-              .map(p => p.date ? getLocalYMD(p.date) : null)
+              .map(p => p[dateKey] ? getLocalYMD(p[dateKey]) : null) // 修正: dateKeyを使用
               .filter(date => date)
           );
 
@@ -102,8 +107,8 @@ export function HomePage() {
           // 今日投稿がある場合（isTodayPosted=true）は、昨日から連続をチェック開始
           // 今日投稿が無い場合（isTodayPosted=false）は、昨日投稿があればそこでストップ（連続0日）
           if (!isTodayPosted && isYesterdayPosted) {
-              // 今日投稿がないが、昨日投稿がある場合は連続は途切れているため、ループは不要
-              // 既に streak = 0 のため何もしない
+              // 今日投稿がないが、昨日投稿がある場合（連続なし）
+              // ループ開始位置は、今日投稿がなければ昨日まででチェック終了
           }
           
           // 昨日の前日（一昨日）から遡ってチェック
@@ -148,20 +153,16 @@ export function HomePage() {
 
   return (
     <>
-      {/* <header className={styles.header}>
-          <div className={styles.brand}><h1>Emolog</h1></div>
-          <p className={styles.tag}>～写真が語る感情～</p>
-          <div className={styles.headerButtons}>
-            <button className={styles.btn}>カレンダー</button>
-            <button className={styles.btn}>マイページ</button>
-          </div>
-        </header> */}
+      {/* ヘッダーは/layout.jsに移動したためコメントアウト */}
       <main className={styles.mainGrid}>
         <aside className={styles.userPanel}>
           <div className={styles.modalWrap}>
             <div className={styles.modalCard} role="region" aria-labelledby="user-card">
+              {/* アバターを大きく */}
               <div className={styles.userAvatar} aria-hidden>{username ? username.charAt(0).toUpperCase() : 'U'}</div>
+              {/* ユーザー名を太く */}
               <h2 className={styles.userName} id="user-card">{username}</h2>
+              {/* 投稿数を表示 */}
               <p className={styles.userMeta}>投稿数: {loading ? '…' : postCount}</p>
             </div>
           </div>
@@ -170,7 +171,9 @@ export function HomePage() {
         <section className={styles.streakColumn}>
           <div className={styles.modalWrap}>
             <div className={styles.modalCard} role="region" aria-labelledby="big-streak">
+              {/* 連続日数を大きく、アクセントカラーで */}
               <div className={styles.bigNumber} id="big-streak">{loading ? '…' : streakDays}</div>
+              {/* 見出しを大きく */}
               <h3 className={styles.bigHeadline}>{loading ? '読み込み中…' : `${streakDays}日連続投稿！`}</h3>
               <p className={styles.description}><strong>{username}</strong> さんの次回作も楽しみです！</p>
 
