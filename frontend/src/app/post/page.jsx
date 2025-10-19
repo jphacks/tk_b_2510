@@ -152,7 +152,7 @@ const PostPage = () => {
 
     // --- JSXの部分 ---
     return (
-        <div className="post-container">
+        <div className="post-page post-container">
             <h2>今日の感情を記録する</h2>
 
             <div className="photo-area">
