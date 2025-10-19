@@ -162,14 +162,22 @@ async def get_user_diaries(user_id: str):
 
         for post in res.data:
             date_obj = post.get("created_at")
-            date_only = date_obj.split(" ")[0] if date_obj else time.strftime("%Y-%m-%d")
+            
+            # 💡 修正点: created_atはISO 8601形式 (YYYY-MM-DDTHH:MM:SSZ) なので、
+            # 'T' または ' ' で分割して日付部分 (YYYY-MM-DD) のみを取得
+            date_only = ""
+            if date_obj:
+                # 'T' または ' ' で分割し、最初の要素(日付)を取得
+                date_only = date_obj.split("T")[0].split(" ")[0]
+            else:
+                date_only = time.strftime("%Y-%m-%d")
             
             # 💡 修正: データベースに保存されている Public URL (image_url) をそのまま使用
             final_image_url = post["image_url"] 
 
             photos_data.append({
                 "id": post["id"],
-                "date": date_only, 
+                "date": date_only, # <-- YYYY-MM-DD 形式
                 "url": final_image_url,
                 "caption": f"AI分析: {post.get('emotion', 'N/A')} - {post.get('comment', 'N/A')}",
             })
