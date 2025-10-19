@@ -100,7 +100,8 @@ const SettingsPage = ({ onGoBack }) => {
     // -----------------------------------
 
     return (
-        <div className="content-container">
+        <div className="settings-page">
+            <div className="settings-container">
             <h2 className="settings-title">設定</h2>
             
             <button 
@@ -204,6 +205,7 @@ const SettingsPage = ({ onGoBack }) => {
                         削除
                     </button>
                 </div>
+            </div>
             </div>
         </div>
     );
@@ -321,7 +323,7 @@ const MyProfile = () => {
 
     return (
         <div style={bodyStyle}>
-            <div className="content-container">
+            <div className="settings-container">
                 <SettingsIcon onClick={() => setView('settings')} />
 
                 <input 
