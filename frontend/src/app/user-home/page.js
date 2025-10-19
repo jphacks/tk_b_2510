@@ -184,12 +184,13 @@ export function HomePage() {
       </main>
       {/* sub navigation under the main columns */}
       <div className={styles.subNav} role="navigation" aria-label="page links">
-        <Link href="/" className={styles.navButton}>index Page</Link>
-        <Link href="/login" className={styles.navButton}>ログイン</Link>
-        <Link href="/post" className={styles.navButton}>投稿ページ</Link>
-        <Link href="/settings" className={styles.navButton}>設定ページ</Link>
-        <Link href="/diary" className={styles.navButton}>日記ページ</Link>
-        <Link href="/user-home" className={styles.navButton}>ホーム</Link>
+        <Link href="/" className={styles.navButton}>Welcome</Link>
+        <Link href="/login" className={styles.navButton}>Logon/Login</Link>
+        <Link href="/user-home" className={styles.navButton}>Home</Link>
+        <Link href="/post" className={styles.navButton}>Post</Link>
+        <Link href="/diary" className={styles.navButton}>Diary</Link>
+        <Link href="/settings" className={styles.navButton}>Settings</Link>
+
       </div>
     </>
   );
