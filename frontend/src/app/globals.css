@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --header-height: 96px; /* ヘッダー高さをここで管理 */
-  --footer-height: 72px; /* フッター高さ（左下に固定する領域） */
+  --header-height: 96px;
+  --footer-height: 72px;
   --background: #ffffff;
   --foreground: #171717;
   --color-background: var(--background);
@@ -10,7 +10,7 @@
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* ダークモード */
+/* ダークモードの基本変数だけ残す */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -18,297 +18,29 @@
   }
 }
 
-/* ページ全体 */
+/* ベースリセット / 全体設定 */
 html, body, #root, #__next, main {
-    height: 100%;
+  height: 100%;
 }
 body {
-    margin: 0;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
 }
 
-/* コンテナ */
-.container {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  box-sizing: border-box;
-  padding: 20px;
-  /* ヘッダー／フッターを固定しないので標準的な余白に戻す */
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
+/* 共通ユーティリティ（必要に応じて追加してください） */
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; height: auto; display: block; }
 
-/* ヘッダー（上部ピンク帯） - 固定しない（通常フロー） */
-.app-header {
-  position: static; /* fixed -> static */
-  top: auto;
-  left: auto;
-  right: auto;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #e7aee6; /* ヘッダー全体の淡いピンク */
-  box-sizing: border-box;
-  padding: 18px 18px; /* 通常の内側余白 */
-  border-bottom: 1px solid #222; /* ヘッダー下の一本線 */
-}
+/* NOTE:
+   ページ固有のレイアウト／見た目（.container, .app-header, .title.cute-title,
+   .tagline, .main-content, .site-footer, .floating-desc など）は
+   src/app/page.css に移動済みです。globals.css に同名セレクタが残っていると
+   競合しますので、もし残っているスタイルがあれば削除してください。
+*/
 
-/* ヘッダー下のフル幅一本線（高さ1px） */
-.app-header::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(255,77,166,0.18), rgba(138,43,226,0.12));
-  pointer-events: none;
-  display: none; /* 固定帯用の疑似要素は無効化（必要なら有効化） */
-}
-
-/* タイトルの箱（中央・枠線） */
-.title.cute-title {
-  font-family: "Georgia", "Hiragino Mincho ProN", serif;
-  font-size: 72px;
-  line-height: 1;
-  font-weight: 300;
-  color: #1a1a1a;
-  background: rgba(255,255,255,0.85); /* ヘッダー内で少し明るい箱 */
-  padding: 6px 28px;
-  border: 2px solid #1a1a1a;
-  border-radius: 4px;
-  display: inline-block;
-  box-shadow: none;
-  margin: 0;
-}
-
-/* タイトル: Emolog */
-.title.cute-title {
-  font-size: 3rem; /* 48px */
-  font-weight: 800;
-  font-family: "Helvetica Neue", "Noto Sans JP", "Yu Gothic", "Meiryo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color: #ff4da6;
-  background: transparent; /* ヘッダー背景と揃える */
-  border: none;
-  padding: 8px 28px;
-  margin: 0;
-  display: inline-block;
-}
-
-/* キャッチコピー等 */
-.tagline-small {
-  font-size: 1.25rem;
-  color: #000;
-  margin: 0;
-  padding-left: 0; /* 20px -> 0 にして左寄せ */
-}
-
-/* 大きいキャッチコピーは左寄せのまま微調整 */
-.tagline-large {
-  font-size: 2.5rem;
-  color: #000;
-  font-weight: 600;
-  text-align: left;
-  margin-top: 10px;
-  margin-bottom: 40px;
-  padding-top: 4px;
-  padding-left: 0; /* 左余白をなくす */
-}
-
-/* 2行目のキャッチコピーを右に寄せる */
-.tagline-offset {
-  margin-left: 120px; /* ここを小さく/大きくして位置を調整してください */
-}
-
-/* 本文テキストのインデントをメインカラムに合わせる */
-.description {
-  font-size: 1rem;
-  color: #000;
-  line-height: 1.7;
-  padding-left: 0; /* 20px -> 0 にして揃える */
-}
-
-/* レイアウト：本文・ナビ */
-.content-wrapper {
-  display: flex;
-  gap: 40px;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-/* 左カラム（本文） */
-.main-content {
-  flex: 1 1 65%;
-  text-align: left;
-  padding-left: 28px; /* 80px -> 28px に縮めて左寄せ（必要ならさらに小さくしてください） */
-}
-
-/* キャッチコピー（上段：左寄せ） */
-.tagline {
-  font-size: 36px;
-  margin: 18px 0 4px 0; /* 左余白を削除して左寄せに */
-  color: #111;
-  text-align: left;
-}
-
-/* キャッチコピー（下段：左寄せ・メインカラムのインデントに合わせる） */
-.tagline-large {
-  font-size: 48px;
-  margin: 18px 0 24px 0; /* 上/右/下/左 */
-  padding: 4px 0 0 0;
-  text-align: left;      /* 中央寄せから左寄せに変更 */
-  color: #111;
-  font-weight: 500;
-}
-
-/* 右カラム（ナビ） */
-.navigation {
-  flex: 0 0 24%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  padding-top: 36px;
-  gap: 12px;
-}
-
-/* Login ボタン見た目 */
-.login-button {
-  display: inline-block;
-  background: #0f5f6f;
-  color: #fff;
-  padding: 12px 36px;
-  border-radius: 2px;
-  border: 2px solid #133;
-  font-size: 28px;
-  letter-spacing: 1px;
-  text-decoration: none;
-  line-height: 1;
-}
-
-/* フッター帯（灰色の横帯） - 固定しない（通常フロー） */
-.site-footer {
-  position: static; /* fixed -> static */
-  left: auto;
-  bottom: auto;
-  width: 100%;
-  height: auto;
-  background: #efefef;
-  border-top: 1px solid rgba(0,0,0,0.06);
-  box-sizing: border-box;
-  padding: 18px 0;
-  z-index: 1;
-}
-
-/* 内側の幅をコンテンツに合わせる */
-.footer-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 48px;
-}
-
-/* 移動した説明文の見た目 */
-.footer-description {
-  margin: 0;
-  color: #333;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  max-width: 880px; /* 長すぎないように制限 */
-  /* 左下に寄せる（必要なら調整） */
-  margin-left: 12px;
-}
-
-/* コンテナ: フッター領域予約を解除して小さめに */
-.container {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  box-sizing: border-box;
-  padding: 20px;
-  padding-top: calc(var(--header-height) + 12px);
-  padding-bottom: 28px; /* 固定要素を reserver しない場合の余白 */
-}
-
-/* （古い footer 関連スタイルは削除しました） */
-
-/* モバイル時 */
-@media (max-width: 768px) {
-  .floating-desc {
-    left: 12px !important;
-    right: 12px !important;
-    bottom: calc(var(--footer-height, 84px) + 12px) !important;
-    max-width: none !important;
-    padding: 10px 12px !important;
-    font-size: 0.92rem !important;
-  }
-}
-
-/* モバイル調整 */
-@media (max-width: 768px) {
-  /* ヘッダー高さを小さくする */
-  :root { --header-height: 72px; }
-  :root { --footer-height: 84px; } /* モバイルはフッター高めに */
-  .container { padding-top: calc(var(--header-height) + 16px); }
-  .container { padding-bottom: calc(var(--footer-height) + 16px); }
-
-  .content-wrapper {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .main-content {
-    text-align: center;
-    padding-left: 0;
-  }
-
-  .description {
-    text-align: left;
-    padding: 0 10px;
-  }
-
-  .navigation {
-    align-items: center;
-    width: 100%;
-    margin-top: 30px;
-    padding-top: 0;
-  }
-
-  .login-button {
-    width: 80%;
-    text-align: center;
-  }
-
-  /* ヘッダー高さに合わせて上余白を調整 */
-  .container {
-    padding-top: 88px; /* モバイル向けに少し小さめに調整 */
-  }
-
-  .title.cute-title {
-    font-size: 2.4rem;
-    padding: 6px 14px;
-  }
-}
-
-@media (max-width: 900px) {
-  .title.cute-title { font-size: 48px; padding: 6px 16px; }
-  .main-content { padding-left: 20px; }
-  .tagline { font-size: 32px; }
-  .tagline-large { font-size: 32px; }
-  .navigation { align-items: center; flex-basis: auto; width: 100%; padding-top: 16px; }
-  .login-button { font-size: 20px; padding: 10px 24px; }
-  .content-wrapper { flex-direction: column; gap: 18px; }
-  .container { padding-top: calc(var(--header-height) + 18px); }
-}
+/* アプリ全体にかけたい追加のグローバルスタイルがあればここに記述してください */
