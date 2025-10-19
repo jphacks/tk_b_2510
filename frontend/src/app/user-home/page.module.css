@@ -1,64 +1,82 @@
+/* frontend/src/app/user-home/page.module.css */
+
+/* Define a custom emotional color palette (Turn 3) */
+:root {
+  --color-ivory: #fdfcfd;
+  --color-soft-lavender: #f3f0f7;
+  --color-deep-lavender: #8a2be2; /* Blue-violet */
+  --color-soft-berry: #eb2563; /* Accent for streak */
+  --color-text-dark: #2c213a;
+  --color-text-muted: #7f788b;
+}
+
 .header{
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 24px 16px; /* vertical increased to 1.5x */
+  padding: 24px 16px; 
   border-bottom: 1px solid #e6e9ef;
-  background-color: #fff1f2; /* pale red background */
+  background-color: var(--color-ivory); /* Soft header background */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
 }
 .brand h1{ margin: 0; font-size: 20px }
-.tag{ color: #6b7280; margin: 0 }
+.tag{ color: var(--color-text-muted); margin: 0 }
 .headerButtons{ margin-left: auto; display: flex; gap: 8px }
-.btn{ background: #f87171; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer }
+.btn{ background: var(--color-soft-berry); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer }
 .btn:hover{ opacity: 0.95 }
 
 .streakWrap{ margin: 24px 16px }
 .userPanel{
-  /* keep aside layout, modalWrap will center the modalCard inside */
   background: transparent;
   border-radius: 8px;
-  padding: 0; /* let modalCard control padding */
+  padding: 0;
   box-shadow: none;
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  height: 50%;
+  /* height/flex removed for natural sizing (Turn 5/6 fix) */
 }
-.userPanel .modalWrap{ /* ensure modal centers inside aside */
+.userPanel .modalWrap{
   min-height: 0;
-  display: flex;
+  /* flex/height removed for natural sizing (Turn 5/6 fix) */
   justify-content: center;
   align-items: center;
   padding: 16px 0;
-  flex: 1; /* fill available column height */
-  height: 100%;
 }
-.userPanel .modalCard{
+/* Reusable Card Style (User Panel & Streak Card) */
+.userPanel .modalCard, .modalCard{
   min-height: 0;
   width: 100%;
-  max-width: none; /* allow filling the column */
-  background: #ffffff; /* white background */
-  border-radius: 8px;
-  color: #0f172a; /* dark text */
+  max-width: none;
+  background: var(--color-ivory); 
+  border-radius: 16px; /* More rounded (Turn 3) */
+  color: var(--color-text-dark); 
   text-align: center;
-  padding: 28px 20px;
+  padding: 32px 24px; /* Increased padding (Turn 3) */
   min-height: 0;
   position: relative;
-  border: 1px solid #0f172a; /* black border */
+  border: 1px solid rgba(138,43,226,0.08); 
+  box-shadow: 0 8px 24px rgba(44,33,58,0.06), 0 0 0 4px var(--color-soft-lavender); /* Shadow (Turn 3) */
+  transition: transform 0.3s cubic-bezier(.2,.9,.2,1), box-shadow 0.3s ease-out; /* Transition (Turn 3) */
 }
+.modalCard:hover, .userPanel .modalCard:hover {
+  transform: translateY(-4px); 
+  box-shadow: 0 16px 36px rgba(44,33,58,0.12), 0 0 0 4px var(--color-soft-lavender);
+}
+
+
 .userAvatar{
-  width: 72px;
-  height: 72px;
+  width: 80px; 
+  height: 80px;
   border-radius: 50%;
-  background: #111827; /* dark avatar background for contrast */
+  background: linear-gradient(135deg, var(--color-deep-lavender), var(--color-soft-berry)); 
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  margin-bottom: 10px;
-  font-size: 24px;
+  margin-bottom: 12px;
+  font-size: 32px; 
   color: white;
   min-height: 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 .icon{
   width: 36px;
@@ -72,7 +90,7 @@
 }
 .titleText{
   font-weight: 600;
-  color: #0f172a;
+  color: var(--color-text-dark);
 }
 .divider{
   height: 1px;
@@ -87,7 +105,7 @@
 .rangeLabel{
   width: 36px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 .progressBarWrap{
   flex: 1;
@@ -105,13 +123,13 @@
 }
 .progressFill{
   height: 100%;
-  background: linear-gradient(90deg,#ffb86b,#ff8a3d);
+  background: linear-gradient(90deg, var(--color-soft-berry), #ff4da6);
   border-radius: 999px 0 0 999px;
 }
 .progressText{
   margin-top: 6px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 .panelFooter{
   display: flex;
@@ -119,7 +137,7 @@
   margin-top: 12px;
 }
 .orangeBtn{
-  background: #ff9b3d;
+  background: var(--color-soft-berry);
   color: white;
   border: none;
   padding: 8px 14px;
@@ -131,83 +149,84 @@
 
 /* modal-style big streak */
 .modalWrap{
-  display: flex;
+  /* flex/height removed for natural sizing (Turn 5/6 fix) */
   justify-content: center;
   padding: 20px 0;
 }
 .modalCard{
+  /* Reusing .userPanel .modalCard styles defined above */
   width: 100%;
-  max-width: none; /* allow filling the column */
-  background: #ffffff; /* white background */
-  border-radius: 8px;
-  color: #0f172a; /* dark text */
+  max-width: none; 
   text-align: center;
-  padding: 28px 20px;
+  padding: 32px 24px;
   position: relative;
-  border: 1px solid #0f172a; /* black border */
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 100%;
 }
 .bigNumber{
-  font-size: 96px;
-  font-weight: 800;
+  font-size: 110px; 
+  font-weight: 900;
   line-height: 1;
   text-shadow: none;
-  color: #0f172a;
+  color: var(--color-deep-lavender); 
 }
 .bigHeadline{
-  margin: 12px 0 6px;
-  font-size: 20px;
-  color: #0f172a;
+  margin: 16px 0 8px;
+  font-size: 24px; 
+  color: var(--color-text-dark);
+  font-weight: 700;
 }
 .description{
   margin: 0 12px 14px;
-  color: #0f172a;
+  color: var(--color-text-dark);
+  font-size: 15px;
 }
 .modalDivider{
   height: 1px;
   background: rgba(0,0,0,0.08);
-  margin: 12px 0 0;
+  margin: 16px 0 0;
 }
 
 @media (max-width: 480px){
-  .bigNumber{ font-size: 64px }
+  .bigNumber{ font-size: 80px }
 }
 
 /* main grid layout */
 .mainGrid{
   display: grid;
-  grid-template-columns: 1fr 1fr; /* two equal columns */
-  gap: 12px; /* reduced from 24px to half */
-  padding: 24px 16px;
-  align-items: stretch; /* make rows stretch to the same height */
-  max-width: 1100px; /* limit width and center grid */
+  grid-template-columns: 1fr 1fr;
+  gap: 24px; /* Increased gap (Turn 3) */
+  padding: 40px 24px; /* Increased padding (Turn 3) */
+  align-items: start; /* Fix: Card stretches vertically (Turn 6 Fix) */
+  height: max-content; /* Limit height to internal content */
+  max-width: 1200px; 
   margin: 0 auto;
+  background: linear-gradient(180deg, var(--color-ivory), var(--color-soft-lavender)); /* Background (Turn 3) */
 }
 .userName{ 
-  margin: 6px 0 2px; 
-  font-size: 20px;
+  margin: 8px 0 4px; 
+  font-size: 24px; 
+  font-weight: 700;
+  color: var(--color-text-dark);
 }
-.userMeta{ color: #0f172a; font-size: 15px }
+.userMeta{ 
+  color: var(--color-text-muted); 
+  font-size: 16px;
+  font-weight: 500;
+}
 .streakColumn{ 
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end; /* 右寄せ（横方向） */
-  justify-content: flex-start;
-  height: 50%;
+  /* display: flex; flex-direction: column; justify-content: flex-start; removed (Turn 5/6 fix) */
+  align-items: flex-end; 
 }
 
 /* ensure the right column's modalWrap behaves like the left one */
 .streakColumn .modalWrap{
   min-height: 0;
-  display: flex;
+  /* flex/height removed for natural sizing (Turn 5/6 fix) */
   justify-content: center;
   align-items: center;
   padding: 16px 0;
-  flex: 1;
-  height: 100%;
 }
 
 /* normalize box model for consistent sizing */
@@ -216,61 +235,57 @@
   padding: 0;
 }
 
-/* sub navigation below the main columns */
+/* sub navigation below the main columns - Stylish Redesign */
 .subNav{
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px; /* reduced from 12px */
-  padding: 8px; /* reduced from 16px */
+  flex-direction: row; 
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px 16px 40px;
 }
 .navButton{
-  background: #ffffff; /* white background */
-  color: #0f172a;
-  padding: 10px 16px;
-  border-radius: 8px;
+  background: linear-gradient(135deg, var(--color-deep-lavender) 0%, var(--color-soft-berry) 100%);
+  color: white;
+  padding: 18px 40px;
+  border-radius: 12px; 
   text-decoration: none;
-  font-weight: 600;
-  width: 220px; /* fixed width column */
+  font-weight: 700;
+  font-size: 16px;
+  width: 240px; 
   text-align: center;
-  border: 1px solid rgba(15,23,42,0.08);
+  border: none;
+  box-shadow: 0 8px 20px rgba(138,43,226,0.35); 
+  transition: transform 0.2s cubic-bezier(.2,.9,.2,1), box-shadow 0.2s ease-out;
 }
 .navButton:hover{
-  background: #f8fafc;
+  background: linear-gradient(135deg, #a55aed 0%, #ff6896 100%);
+  transform: translateY(-5px); 
+  box-shadow: 0 12px 28px rgba(138,43,226,0.5); 
 }
 
 @media (max-width: 768px){
-  .mainGrid{ grid-template-columns: 1fr; }
+  .mainGrid{ 
+    grid-template-columns: 1fr; 
+    padding: 24px 16px; 
+  }
   .streakColumn{ order: 2 }
   .userPanel{ order: 1 }
+  /* Sub Nav mobile adjustments */
+  .subNav{
+    flex-direction: column; 
+    gap: 12px;
+    padding: 24px 16px;
+  }
+  .navButton{
+    width: 100%; 
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 14px 20px;
+  }
 }
 
-/* footer grass */
+/* footer grass: hiding for a cleaner look */
 .footerGrass{
-  display: flex;
-  align-items: flex-end;
-  gap: 6px;
-  padding: 12px 8px;
-  background: linear-gradient(180deg,#f8fafc,#ffffff);
-}
-.grassImg{
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  transform-origin: bottom center;
-  transform: scaleY(0.2);
-  opacity: 0.35;
-}
-.grassImg.grown{
-  opacity: 1;
-  animation: growImg 700ms cubic-bezier(.2,.9,.2,1) forwards;
-}
-@keyframes growImg{
-  from{ transform: scaleY(0.2) }
-  to{ transform: scaleY(1) }
-}
-
-@media (max-width: 480px){
-  .footerGrass{ gap: 4px }
-  .grassBlade{ width: 5px }
+  display: none;
 }
