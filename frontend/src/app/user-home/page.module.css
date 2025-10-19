@@ -22,7 +22,7 @@
   text-align: center;
   display: flex;
   flex-direction: column;
-  height: 50%;
+  height: 66vh; /* 2/3 of viewport height */
 }
 .userPanel .modalWrap{ /* ensure modal centers inside aside */
   min-height: 0;
@@ -181,7 +181,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr; /* two equal columns */
   gap: 12px; /* reduced from 24px to half */
-  padding: 24px 16px;
+  padding: px 16px;
   align-items: stretch; /* make rows stretch to the same height */
   max-width: 1100px; /* limit width and center grid */
   margin: 0 auto;
@@ -196,7 +196,7 @@
   flex-direction: column;
   align-items: flex-end; /* 右寄せ（横方向） */
   justify-content: flex-start;
-  height: 50%;
+  height: 66vh; /* 2/3 of viewport height */
 }
 
 /* ensure the right column's modalWrap behaves like the left one */
