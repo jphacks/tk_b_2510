@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
+import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import AuthGuard from '../../lib/AuthGuard';
 
@@ -178,6 +179,15 @@ export function HomePage() {
           </div>
         </section>
       </main>
+      {/* sub navigation under the main columns */}
+      <div className={styles.subNav} role="navigation" aria-label="page links">
+        <Link href="/" className={styles.navButton}>index Page</Link>
+        <Link href="/login" className={styles.navButton}>ログイン</Link>
+        <Link href="/post" className={styles.navButton}>投稿ページ</Link>
+        <Link href="/settings" className={styles.navButton}>設定ページ</Link>
+        <Link href="/diary" className={styles.navButton}>日記ページ</Link>
+        <Link href="/user-home" className={styles.navButton}>ホーム</Link>
+      </div>
     </>
   );
 }
