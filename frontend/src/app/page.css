@@ -1,0 +1,228 @@
+/* ページ専用スタイル（page.jsx 用に globals.css から移管） */
+
+:root {
+  --content-max-width: 1100px;
+  --header-height: 96px;
+  --footer-height: 72px;
+}
+
+/* --- 追加: 背景画像を全体に適用 --- */
+body {
+  background-color: #ffffff;
+  color: #111;
+}
+
+/* コンテナ（ページ固有の余白調整） */
+.container {
+  position: relative;
+  z-index: 1;               /* 側面の背景より前面に出す */
+  background: #ffffff;      /* 必ず白にして左右背景が見えるように */
+  border-radius: 6px;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 20px;
+  padding-top: calc(var(--header-height) + 12px);
+  padding-bottom: 28px;
+}
+
+/* 左右の余白領域に画像を表示（ヘッダー〜フッター間のみ） */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  top: var(--header-height);
+  bottom: var(--footer-height);
+  width: clamp(0px, calc((100% - var(--content-max-width)) / 2), 50%);
+  background-image: url('/images/emolog-bg.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover; /* 余白領域に合わせて自動調整 */
+  pointer-events: none;
+  z-index: 0;
+  opacity: 1;
+}
+
+/* 左側 */
+body::before {
+  left: 0;
+}
+
+/* 右側（左右反転して見栄えを揃えるなら transform を付ける） */
+body::after {
+  right: 0;
+  /* もし左右で反転表示したければコメント解除:
+     transform: scaleX(-1);
+  */
+}
+
+/* 小さい画面では余白がなくなるので疑似要素を消す（読みやすさのため） */
+@media (max-width: calc(var(--content-max-width) + 40px)) {
+  body::before,
+  body::after {
+    display: none;
+  }
+}
+
+/* ヘッダー（上部ピンク帯・通常フロー） */
+.app-header {
+  position: static;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #e7aee6;
+  box-sizing: border-box;
+  padding: 18px;
+  border-bottom: 1px solid #222;
+}
+
+/* タイトルの箱（中央・枠線） */
+.title.cute-title {
+  font-family: "Georgia", "Hiragino Mincho ProN", serif;
+  font-size: 72px;
+  line-height: 1;
+  font-weight: 300;
+  color: #1a1a1a;
+  background: rgba(255,255,255,0.85);
+  padding: 6px 28px;
+  border: 2px solid #1a1a1a;
+  border-radius: 4px;
+  display: inline-block;
+  box-shadow: none;
+  margin: 0;
+}
+
+/* タイトル（上書き調整） */
+.title.cute-title {
+  font-size: 3rem;
+  font-weight: 800;
+  font-family: "Helvetica Neue", "Noto Sans JP", "Yu Gothic", "Meiryo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #ff4da6;
+  background: transparent;
+  border: none;
+  padding: 8px 28px;
+  margin: 0;
+  display: inline-block;
+}
+
+/* キャッチコピー系 */
+.tagline-small {
+  font-size: 1.25rem;
+  color: #000;
+  margin: 0;
+  padding-left: 0;
+}
+.tagline {
+  font-size: 36px;
+  margin: 18px 0 4px 0;
+  color: #111;
+  text-align: left;
+}
+.tagline-large {
+  font-size: 56px;
+  margin: 18px 0 24px 0;
+  padding: 4px 0 0 0;
+  text-align: left;
+  color: #111;
+  font-weight: 500;
+}
+/* 2行目の右寄せ（調整用） */
+.tagline-offset {
+  margin-left: 120px;
+}
+
+/* レイアウト */
+.content-wrapper {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* 左カラム */
+.main-content {
+  flex: 1 1 65%;
+  text-align: left;
+  padding-left: 0px;
+}
+
+/* 右カラム / ナビ */
+.navigation {
+  flex: 0 0 24%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-top: 36px;
+  gap: 12px;
+}
+
+/* Login ボタン */
+.login-button {
+  display: inline-block;
+  background: #0f5f6f;
+  color: #fff;
+  padding: 12px 36px;
+  border-radius: 2px;
+  border: 2px solid #133;
+  font-size: 28px;
+  letter-spacing: 1px;
+  text-decoration: none;
+  line-height: 1;
+}
+
+/* footer系（ページ内フロー用） */
+.site-footer {
+  position: static;
+  width: 100%;
+  height: auto;
+  background: #efefef;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  box-sizing: border-box;
+  padding: 18px 0;
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 48px;
+}
+.footer-description {
+  margin: 0;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 880px;
+  margin-left: 12px;
+}
+
+/* 浮動説明（もし使うなら） */
+.floating-desc {
+  position: fixed;
+  left: 16px;
+  bottom: calc(var(--footer-height, 72px) + 16px);
+  z-index: 9000;
+  max-width: 420px;
+  background: rgba(255,255,255,0.95);
+  color: #333;
+  padding: 12px 14px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(12,12,20,0.06);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* モバイル調整 */
+@media (max-width: 900px) {
+  .title.cute-title { font-size: 48px; padding: 6px 16px; }
+  .main-content { padding-left: 20px; }
+  .tagline { font-size: 32px; }
+  .tagline-large { font-size: 32px; }
+  .navigation { align-items: center; flex-basis: auto; width: 100%; padding-top: 16px; }
+  .login-button { font-size: 20px; padding: 10px 24px; }
+  .content-wrapper { flex-direction: column; gap: 18px; }
+  .container { padding-top: calc(var(--header-height) + 18px); }
+}
