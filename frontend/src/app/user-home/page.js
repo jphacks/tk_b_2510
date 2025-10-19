@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import { supabase } from '../../lib/supabaseClient';
+import AuthGuard from '../../lib/AuthGuard';
 
 export default function HomePage() {
   const [username, setUsername] = useState('あなた');
@@ -195,5 +196,13 @@ export default function HomePage() {
             </div>
           </footer>
     </>
+  );
+}
+
+export default function HomeWrapper() {
+  return (
+    <AuthGuard>
+      <HomePage />
+    </AuthGuard>
   );
 }
