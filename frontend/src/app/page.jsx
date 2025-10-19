@@ -4,9 +4,11 @@ import './globals.css'; // スタイルを別ファイルから読み込みま�
 function App() {
   return (
     <div className="container">
+      {/*
       <header className="app-header">
         <h1 className="title cute-title">Emolog</h1>
       </header>
+      */}
       
       {/* メインコンテンツとナビゲーションを左右に並べるためのラッパー */}
       <div className="content-wrapper">
