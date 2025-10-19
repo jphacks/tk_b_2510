@@ -147,14 +147,14 @@ export function HomePage() {
 
   return (
     <>
-      <header className={styles.header}>
+      {/* <header className={styles.header}>
           <div className={styles.brand}><h1>Emolog</h1></div>
           <p className={styles.tag}>～写真が語る感情～</p>
           <div className={styles.headerButtons}>
             <button className={styles.btn}>カレンダー</button>
             <button className={styles.btn}>マイページ</button>
           </div>
-        </header>
+        </header> */}
       <main className={styles.mainGrid}>
         <aside className={styles.userPanel}>
           <div className={styles.modalWrap}>
@@ -178,23 +178,6 @@ export function HomePage() {
           </div>
         </section>
       </main>
-        <footer>
-          <div className={styles.footerGrass} role="contentinfo" aria-label="footer grass">
-              {Array.from({ length: 30 }).map((_, i) => {
-                const grown = !loading && i < Math.min(30, Math.max(0, streakDays));
-                return (
-                  <img
-                    key={i}
-                    src="/images/grass.png"
-                    className={`${styles.grassImg} ${grown ? styles.grown : ''}`}
-                    alt=""
-                    aria-hidden
-                    style={{ animationDelay: `${(i % 6) * 80}ms` }}
-                  />
-                );
-              })}
-            </div>
-          </footer>
     </>
   );
 }

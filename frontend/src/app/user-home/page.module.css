@@ -169,13 +169,13 @@
 }
 .userName{ 
   margin: 6px 0 2px; 
-  font-size: 50px;
+  font-size: 10px;
 }
 .userMeta{ color: #ffffff; font-size: 15px }
 .streakColumn{ 
   display: flex; 
   align-items: flex-start; 
-  
+  justify-content: flex-end; /* 右寄せ */
 }
 
 @media (max-width: 768px){
