@@ -1,4 +1,4 @@
-/* ページ専用スタイル（page.jsx 用に globals.css から移管） */
+/* ページ専用スタイル（復元: サイド余白に背景画像を表示する構成） */
 
 :root {
   --content-max-width: 1100px;
@@ -6,17 +6,22 @@
   --footer-height: 72px;
 }
 
-/* --- 追加: 背景画像を全体に適用 --- */
+/* body は白背景に */
 body {
-  background-color: #ffffff;
+  background-image: url('/images/emolog-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* 固定したくなければ削除 */
+  background-color: #ffffff;    /* 画像読み込み失敗時のフォールバック */
   color: #111;
 }
 
-/* コンテナ（ページ固有の余白調整） */
+/* コンテナは白で上に表示 */
 .container {
   position: relative;
   z-index: 1;               /* 側面の背景より前面に出す */
-  background: #ffffff;      /* 必ず白にして左右背景が見えるように */
+  background: transparent;  /* 背景を透明に変更 */
   border-radius: 6px;
   width: 100%;
   max-width: var(--content-max-width);
@@ -84,7 +89,6 @@ body::after {
   line-height: 1;
   font-weight: 300;
   color: #1a1a1a;
-  background: rgba(255,255,255,0.85);
   padding: 6px 28px;
   border: 2px solid #1a1a1a;
   border-radius: 4px;
@@ -113,31 +117,87 @@ body::after {
   margin: 0;
   padding-left: 0;
 }
+.tagline-small {
+  font-size: 1.25rem;
+  color: #000;
+  margin: 0;
+  padding-left: 0;
+}
+
+/* Headline backgrounds: keep a white block on the left but fade to transparent on the right */
 .tagline {
   font-size: 36px;
   margin: 18px 0 4px 0;
   color: #111;
   text-align: left;
+  display: inline-block;
+  padding: 10px 18px 10px 18px;
+  background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 58%, rgba(255,255,255,0) 100%);
+  /* keep a small box shadow to separate text from background image */
+  box-shadow: 0 6px 18px rgba(12,12,20,0.06);
 }
 .tagline-large {
   font-size: 56px;
   margin: 18px 0 24px 0;
-  padding: 4px 0 0 0;
+  padding: 14px 30px 14px 30px; /* widen for pill feel */
   text-align: left;
   color: #111;
-  font-weight: 500;
-}
-/* 2行目の右寄せ（調整用） */
-.tagline-offset {
-  margin-left: 120px;
+  /* softer font styling */
+  font-family: "Inter", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  display: inline-block;
+  background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 58%, rgba(255,255,255,0) 100%);
+  box-shadow: 0 8px 24px rgba(12,12,20,0.06);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.2px;
+  line-height: 1.02; /* tight but readable for large headline */
+  border-radius: 999px; /* pill shape */
+  border: 1px solid rgba(0,0,0,0.06);
+  background-clip: padding-box;
+  backdrop-filter: blur(4px); /* subtle softening */
+  transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease;
 }
 
+/* offset second line to align as stacked pill */
+.tagline-large.tagline-offset {
+  display: inline-block;
+  margin-top: 6px;
+  transform-origin: left center;
+}
+
+.tagline-large:hover,
+.tagline-large:focus {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(12,12,20,0.08);
+}
+
+/* Description: style similar to tagline-large but subtler and readable */
+.description {
+  max-width: 860px;
+  font-size: 18px;
+  line-height: 1.85;
+  color: #222;
+  /* softer font settings to match headline */
+  font-family: "Noto Sans JP", "Inter", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.12px;
+  background: linear-gradient(to right, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.96) 80%, rgba(255,255,255,0) 100%);
+  display: block;
+  padding: 16px 20px;
+  margin-top: 18px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(12,12,20,0.05);
+}
 /* レイアウト */
 .content-wrapper {
   display: flex;
   gap: 40px;
   align-items: flex-start;
   justify-content: space-between;
+  margin-bottom: 150px;
 }
 
 /* 左カラム */
@@ -159,16 +219,29 @@ body::after {
 
 /* Login ボタン */
 .login-button {
-  display: inline-block;
-  background: #0f5f6f;
-  color: #fff;
-  padding: 12px 36px;
-  border-radius: 2px;
-  border: 2px solid #133;
-  font-size: 28px;
-  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ff4da6;               /* 背景を透かして馴染ませる */
+  color: #1f2937;                        /* 暗めのテキスト色で落ち着かせる */
+  padding: 10px 22px;                    /* 小さめにして浮いた印象を軽減 */
+  font-size: 35px;                       /* 大きすぎないサイズ */
+  font-weight: 600;
+  border: 1.5px solid rgba(0,0,0,0.08);  /* 薄いボーダーで明確に */
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(12,12,20,0.04);
   text-decoration: none;
-  line-height: 1;
+  transition: transform .16s ease, box-shadow .16s ease, background-color .16s ease, border-color .16s ease, color .16s ease;
+}
+
+/* ホバーでアクセント（控えめ） */
+.login-button:hover,
+.login-button:focus {
+  background: rgba(255,77,166,0.06);          /* ヘッダーのピンクと馴染む薄い色 */
+  border-color: rgba(255,77,166,0.35);
+  color: #ff4da6;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(12,12,20,0.08);
 }
 
 /* footer系（ページ内フロー用） */
@@ -176,20 +249,24 @@ body::after {
   position: static;
   width: 100%;
   height: auto;
-  background: #efefef;
+  background: #ffffff;
   border-top: 1px solid rgba(0,0,0,0.06);
   box-sizing: border-box;
   padding: 18px 0;
+  z-index: 1;
 }
+
 .footer-inner {
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   min-height: 48px;
+  background: transparent;
 }
+
 .footer-description {
   margin: 0;
   color: #333;
@@ -225,4 +302,12 @@ body::after {
   .login-button { font-size: 20px; padding: 10px 24px; }
   .content-wrapper { flex-direction: column; gap: 18px; }
   .container { padding-top: calc(var(--header-height) + 18px); }
+}
+
+/* サイド背景を無効化（擬似要素を非表示にする） */
+body::before,
+body::after {
+  display: none !important;
+  background: none !important;
+  pointer-events: none !important;
 }

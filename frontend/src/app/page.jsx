@@ -11,7 +11,8 @@ function App() {
       */}
       
       {/* ヘッダーとフッターの間だけ背景を表示するラッパー */}
-      <div className="content-wrapper">
+      <div className="page-body-bg">    {/* ヘッダーとフッターの間だけ背景を表示するラッパー */}
+        <div className="content-wrapper">
         
         {/* 左側のメインコンテンツ */}
         <main className="main-content">
@@ -23,7 +24,8 @@ function App() {
           </p>
           <p className="description">
             Emologは、AIによる感情分析とリキャップによるセルフケア・ジャーナリングアプリです。
-            日々の感情を記録するだけでなく、AIが写真に対してコメントを返し、それらがリキャップとして映像になることで、
+            日々の感情を記録するだけでなく、AIが写真に対してコメントを返し
+            それらがリキャップとして映像になることで、
             至高のエモいを体感します。
           </p>
         </main>
@@ -33,6 +35,7 @@ function App() {
           <a href="/login" className="nav-link login-button">Logon/Login</a>
         </nav>
 
+      </div>
       </div>
 
     
