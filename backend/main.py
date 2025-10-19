@@ -50,7 +50,8 @@ app = FastAPI()
 # フロントエンド(localhost:3000)からのアクセスを許可
 origins = [
     "http://localhost:3000",
-    "https://tk-b-2510.vercel.app",
+    "https://tk-b-2510-psi.vercel.app",
+    "https://emolog-psi.vercel.app"
 ]
 
 app.add_middleware(
