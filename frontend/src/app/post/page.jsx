@@ -6,7 +6,8 @@ import { supabase } from '../../lib/supabaseClient';
 import './page.css'; 
 import AuthGuard from '../../lib/AuthGuard';
 
-const API_ENDPOINT = 'http://localhost:8000/analyze-and-save'; 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_ENDPOINT = `${API_BASE_URL}/analyze-and-save`;
 
 // 💡 追加: 分析結果を表示するためのモーダルコンポーネント
 const ResultModal = ({ data, onClose }) => {

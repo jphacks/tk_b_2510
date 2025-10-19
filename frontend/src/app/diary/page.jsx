@@ -53,11 +53,11 @@ function DiaryPage() {
                 }
                 const userId = user.id;
 
-                // 2) user_id をクエリに含めて API を呼ぶ
                 // 💡 修正: Next.jsの404エラーを回避するため、FastAPIの完全なURLに修正 (http://localhost:8000/photos)
-                const API_ENDPOINT = `http://localhost:8000/photos?user_id=${encodeURIComponent(userId)}`;
+                const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+                const API_ENDPOINT = `${API_BASE_URL}/photos?user_id=${encodeURIComponent(userId)}`;
                 const res = await fetch(API_ENDPOINT);
-
+                
                 if (!res.ok) {
                     const text = await res.text().catch(() => null);
                     console.warn('fetch /api/photos failed', res.status, text);
