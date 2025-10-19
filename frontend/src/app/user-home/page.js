@@ -5,7 +5,7 @@ import styles from "./page.module.css";
 import { supabase } from '../../lib/supabaseClient';
 import AuthGuard from '../../lib/AuthGuard';
 
-export default function HomePage() {
+export function HomePage() {
   const [username, setUsername] = useState('あなた');
   const [streakDays, setStreakDays] = useState(0);
   const [postCount, setPostCount] = useState(0);
