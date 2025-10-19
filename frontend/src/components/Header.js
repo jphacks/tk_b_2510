@@ -20,12 +20,13 @@ export default function Header() {
         </div>
 
         <nav>
-          <Link href="/" style={{ margin: '0 10px' }}>index Page</Link>
-          <Link href="/login" style={{ margin: '0 10px' }}>ログイン</Link>
-          <Link href="/post" style={{ margin: '0 10px' }}>投稿ページ</Link>
-          <Link href="/settings" style={{ margin: '0 10px' }}>設定ページ</Link>
-          <Link href="/diary" style={{ margin: '0 10px' }}>日記ページ</Link>
-          <Link href="/user-home" style={{ margin: '0 10px' }}>ホーム</Link>
+          <Link href="/" style={{ margin: '0 10px' }}>Welcome</Link>
+          <Link href="/login" style={{ margin: '0 10px' }}>Logon/Login</Link>
+          <Link href="/user-home" style={{ margin: '0 10px' }}>UserHome</Link>
+          <Link href="/post" style={{ margin: '0 10px' }}>Post</Link>
+          <Link href="/diary" style={{ margin: '0 10px' }}>Diary</Link>
+          <Link href="/settings" style={{ margin: '0 10px' }}>Settings</Link>
+
         </nav>
       </div>
     </header>
